@@ -1,0 +1,18 @@
+.toast {
+  padding: var(--spacing-3);
+  border-radius: var(--border-radius-medium);
+  margin-bottom: var(--spacing-2);
+  color: var(--color-enlightened-white);
+}
+
+.info {
+  background-color: var(--color-synthesis-blue); /* Example info color */
+}
+
+.success {
+  background-color: var(--color-success); /* Example success color */
+}
+
+.error {
+  background-color: var(--color-error); /* Example error color */
+}

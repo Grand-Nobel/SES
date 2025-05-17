@@ -1,0 +1,114 @@
+{
+  "dashboard": {
+    "title": "مرحبًا بك في لوحة تحكم {tenant}",
+    "aria": {
+      "dashboard": "لوحة التحكم",
+      "kpis": "مؤشرات الأداء الرئيسية",
+      "chat": "واجهة الدردشة الذكية",
+      "page_loaded": "تم تحميل لوحة التحكم",
+      "settings_button": "فتح الإعدادات",
+      "settings_opened": "تم فتح الإعدادات",
+      "settings_closed": "تم إغلاق الإعدادات",
+      "toggle_contrast": "تبديل وضع التباين العالي",
+      "high_contrast_enabled": "تم تفعيل وضع التباين العالي",
+      "high_contrast_disabled": "تم تعطيل وضع التباين العالي",
+      "no_kpis": "لا توجد مؤشرات أداء متاحة"
+    },
+    "loading": "جارٍ التحميل...",
+    "error": {
+      "page_load": "فشل في تحميل الصفحة: {message}",
+      "auth_failed": "فشل المصادقة"
+    },
+    "settings_title": "الإعدادات",
+    "settings_content": "تخصيص تجربتك.",
+    "customize_colors": "تخصيص الألوان",
+    "apply_color": "تطبيق اللون",
+    "consent_title": "الموافقة مطلوبة",
+    "consent_message": "هل تسمح لنا بتخزين بيانات العلامة التجارية الخاصة بك؟",
+    "consent_label": "أوافق على تخزين بيانات العلامة التجارية الخاصة بي",
+    "aria": {
+      "select_color": "اختر لونًا",
+      "consent_checkbox": "الموافقة على تخزين بيانات العلامة التجارية",
+      "theme_saved": "تم حفظ السمة بنجاح"
+    },
+    "save_button": "حفظ",
+    "cancel_button": "إلغاء",
+    "close_button": "إغلاق",
+    "theme_save_failed": "فشل في حفظ السمة"
+  },
+  "topbar": {
+    "sync_status": "في انتظار المزامنة: {count} عناصر",
+    "last_sync": "آخر مزامنة: {time}",
+    "aria": {
+      "tenant_switcher": "اختر المستأجر",
+      "locale_switcher": "اختر اللغة"
+    }
+  },
+  "sidebar": {
+    "dashboard": "لوحة التحكم",
+    "overview": "نظرة عامة",
+    "reports": "التقارير",
+    "analytics": "التحليلات",
+    "notifications": "الإشعارات",
+    "settings": "الإعدادات",
+    "aria": {
+      "navigation": "التنقل الرئيسي",
+      "toggle_menu": "تبديل قائمة التنقل"
+    }
+  },
+  "analytics": {
+    "title": "لوحة تحكم التحليلات",
+    "metric": "المقياس",
+    "value": "القيمة",
+    "change": "التغيير"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "add_notification": "إضافة إشعار",
+    "new_notification": "تم استلام إشعار جديد",
+    "aria": {
+      "notifications": "الإشعارات",
+      "notifications_list": "قائمة الإشعارات",
+      "notifications_loaded": "تم تحميل الإشعارات",
+      "add_notification": "إضافة إشعار جديد"
+    },
+    "loading": "جارٍ التحميل..."
+  },
+  "settings": {
+    "themes_title": "السمات",
+    "customize_colors": "تخصيص الألوان",
+    "apply_color": "تطبيق اللون",
+    "consent_title": "الموافقة مطلوبة",
+    "consent_message": "هل تسمح لنا بتخزين بيانات العلامة التجارية الخاصة بك؟",
+    "consent_label": "أوافق على تخزين بيانات العلامة التجارية الخاصة بي",
+    "aria": {
+      "select_color": "اختر لونًا",
+      "consent_checkbox": "الموافقة على تخزين بيانات العلامة التجارية",
+      "theme_saved": "تم حفظ السمة بنجاح"
+    },
+    "save_button": "حفظ",
+    "cancel_button": "إلغاء",
+    "loading": "جارٍ التحميل...",
+    "error": {
+      "theme_save_failed": "فشل في حفظ السمة"
+    }
+  },
+  "install": {
+    "install_title": "تثبيت تطبيق SES",
+    "install_message": "هل ترغب في تثبيت تطبيق SES لتجربة أفضل؟",
+    "install_button": "تثبيت",
+    "dismiss_button": "رفض"
+  },
+  "shortcuts": {
+    "recommended_shortcuts": "الاختصارات الموصى بها",
+    "offline_message": "الاختصارات غير متاحة بدون اتصال"
+  },
+  "connectors": {
+    "status": "الحالة",
+    "connect": "اتصل",
+    "retry": "إعادة المحاولة",
+    "error": {
+      "connection_failed": "فشل الاتصال"
+    }
+  }
+}
