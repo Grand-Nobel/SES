@@ -1,0 +1,114 @@
+{
+  "dashboard": {
+    "title": "Welcome to {tenant} Dashboard",
+    "aria": {
+      "dashboard": "Dashboard",
+      "kpis": "Key Performance Indicators",
+      "chat": "AI Chat Interface",
+      "page_loaded": "Dashboard loaded",
+      "settings_button": "Open settings",
+      "settings_opened": "Settings opened",
+      "settings_closed": "Settings closed",
+      "toggle_contrast": "Toggle high contrast mode",
+      "high_contrast_enabled": "High contrast mode enabled",
+      "high_contrast_disabled": "High contrast mode disabled",
+      "no_kpis": "No KPIs available"
+    },
+    "loading": "Loading...",
+    "error": {
+      "page_load": "Failed to load page: {message}",
+      "auth_failed": "Authentication failed"
+    },
+    "settings_title": "Settings",
+    "settings_content": "Customize your experience.",
+    "customize_colors": "Customize Colors",
+    "apply_color": "Apply Color",
+    "consent_title": "Consent Required",
+    "consent_message": "Do you allow us to store your branding data?",
+    "consent_label": "I consent to storing my branding data",
+    "aria": {
+      "select_color": "Select a color",
+      "consent_checkbox": "Consent to store branding data",
+      "theme_saved": "Theme saved successfully"
+    },
+    "save_button": "Save",
+    "cancel_button": "Cancel",
+    "close_button": "Close",
+    "theme_save_failed": "Failed to save theme"
+  },
+  "topbar": {
+    "sync_status": "Pending sync: {count} items",
+    "last_sync": "Last sync: {time}",
+    "aria": {
+      "tenant_switcher": "Select tenant",
+      "locale_switcher": "Select language"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "overview": "Overview",
+    "reports": "Reports",
+    "analytics": "Analytics",
+    "notifications": "Notifications",
+    "settings": "Settings",
+    "aria": {
+      "navigation": "Main navigation",
+      "toggle_menu": "Toggle navigation menu"
+    }
+  },
+  "analytics": {
+    "title": "Analytics Dashboard",
+    "metric": "Metric",
+    "value": "Value",
+    "change": "Change"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "add_notification": "Add Notification",
+    "new_notification": "New notification received",
+    "aria": {
+      "notifications": "Notifications",
+      "notifications_list": "Notifications list",
+      "notifications_loaded": "Notifications loaded",
+      "add_notification": "Add a new notification"
+    },
+    "loading": "Loading..."
+  },
+  "settings": {
+    "themes_title": "Themes",
+    "customize_colors": "Customize Colors",
+    "apply_color": "Apply Color",
+    "consent_title": "Consent Required",
+    "consent_message": "Do you allow us to store your branding data?",
+    "consent_label": "I consent to storing my branding data",
+    "aria": {
+      "select_color": "Select a color",
+      "consent_checkbox": "Consent to store branding data",
+      "theme_saved": "Theme saved successfully"
+    },
+    "save_button": "Save",
+    "cancel_button": "Cancel",
+    "loading": "Loading...",
+    "error": {
+      "theme_save_failed": "Failed to save theme"
+    }
+  },
+  "install": {
+    "install_title": "Install SES App",
+    "install_message": "Would you like to install the SES app for a better experience?",
+    "install_button": "Install",
+    "dismiss_button": "Dismiss"
+  },
+  "shortcuts": {
+    "recommended_shortcuts": "Recommended Shortcuts",
+    "offline_message": "Shortcuts unavailable offline"
+  },
+  "connectors": {
+    "status": "Status",
+    "connect": "Connect",
+    "retry": "Retry",
+    "error": {
+      "connection_failed": "Connection failed"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+.ai-thinking {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-2);
+}
+
+.ai-thinking__dots {
+  display: flex;
+  gap: var(--spacing-1);
+  /* animation: pulse 1.5s infinite; */ /* Assuming pulse animation is defined elsewhere or not strictly needed for placeholder */
+}
+
+/* Added placeholder style for dots if Icon is not used */
+.ai-thinking__dots-placeholder {
+  display: flex;
+  gap: var(--spacing-1);
+  animation: pulse 1.5s infinite; /* Copied from SEED doc example */
+}
+
+
+.ai-thinking__step {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+@keyframes pulse { /* Copied from SEED doc example */
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}

@@ -1,0 +1,9 @@
+.kpi-card {
+  padding: var(--space-3);
+  border-radius: var(--border-radius-medium);
+  box-shadow: var(--shadow-low);
+}
+
+.trend--up { color: green; }
+.trend--down { color: red; }
+.trend--neutral { color: gray; }

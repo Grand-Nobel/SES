@@ -1,0 +1,95 @@
+.contrast-checker {
+  padding: var(--spacing-4);
+  background: var(--color-background-primary);
+  border-radius: var(--border-radius-medium);
+  font-family: sans-serif; /* Added a default font */
+}
+
+.contrast-checker__inputs {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-2);
+}
+
+.contrast-checker__input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.contrast-checker__input-group label {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary); /* Assuming a text secondary color variable */
+}
+
+.contrast-checker__input-group input[type="color"] {
+  width: 100%;
+  height: 40px; /* Consistent height */
+  border: 1px solid var(--color-border, #ccc); /* Assuming a border color variable */
+  border-radius: var(--border-radius-small);
+  padding: 0; /* Remove default padding for color input */
+}
+
+.contrast-checker__input-group input[type="text"] {
+  padding: var(--spacing-2);
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: var(--border-radius-small);
+  font-size: 1rem;
+}
+
+
+.contrast-checker__preview {
+  display: flex;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-2);
+}
+
+.contrast-checker__preview-text,
+.contrast-checker__preview-recommended {
+  padding: var(--spacing-3);
+  border: 1px solid var(--color-cerebral-gray);
+  border-radius: var(--border-radius-medium); /* Added border radius */
+  flex: 1; /* Allow previews to take equal space */
+  text-align: center; /* Center text */
+}
+
+.contrast-checker__results {
+  margin-top: var(--spacing-2);
+  padding: var(--spacing-3);
+  background-color: var(--color-background-secondary, #f9f9f9); /* Assuming a secondary background */
+  border-radius: var(--border-radius-medium);
+}
+
+.contrast-checker__results p {
+  margin-bottom: var(--spacing-1);
+}
+
+.contrast-checker__requirements ul {
+  list-style: none;
+  padding: 0;
+  margin-top: var(--spacing-1);
+}
+
+.contrast-checker__requirements li {
+  margin-bottom: var(--spacing-0-5); /* Assuming half spacing unit */
+}
+
+.contrast-checker__recommendation {
+  margin-top: var(--spacing-3);
+  padding-top: var(--spacing-2);
+  border-top: 1px solid var(--color-border, #eee);
+}
+
+.contrast-checker__recommendation button {
+  margin-top: var(--spacing-1);
+  padding: var(--spacing-2) var(--spacing-3);
+  background-color: var(--color-primary, blue); /* Assuming primary color variable */
+  color: var(--color-text-on-primary, white); /* Assuming text on primary color */
+  border: none;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+}
+
+.contrast-checker__recommendation button:hover {
+  opacity: 0.9;
+}
