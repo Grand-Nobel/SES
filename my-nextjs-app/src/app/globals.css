@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* Colors (from seed-tokens.json) */
+  --color-background: #1A1C2C;
+  --color-surface: #212336;
+  --color-onBackground: #E0E0FF;
+  --color-primary: #00F0FF;
+  --color-onSurface: #FFFFFF;
+  /* Spacing */
+  --space-4: 16px;
+  --space-6: 24px;
+  --radius-2: 8px;
+  /* Typography */
+  --font-size-h1: 2.25rem;  /* 36px */
+  --font-size-h2: 1.5rem;   /* 24px */
+  --font-size-body: 1rem;   /* 16px */
+}
+
+.font-inter { font-family: 'Inter', sans-serif; }
+.bg-background { background-color: var(--color-background); }
+.text-onBackground { color: var(--color-onBackground); }
+.container { max-width: 1280px; margin: 0 auto; padding: var(--space-4); }
+
+h1 { font-size: var(--font-size-h1); margin-bottom: var(--space-6); }
+h2 { font-size: var(--font-size-h2); margin-bottom: var(--space-4); }
+
+p, label { font-size: var(--font-size-body); margin-bottom: var(--space-4); }
+
+button:hover { background-color: rgba(0,240,255,0.1); }
+
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }

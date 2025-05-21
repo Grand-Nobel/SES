@@ -1,0 +1,24 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "SES API", "version": "1.0.0" },
+  "paths": {
+    "/api/validation-rules": {
+      "get": {
+        "summary": "Get tenant validation rules",
+        "parameters": [
+          { "name": "x-tenant-id", "in": "header", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Success", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ValidationRules" } } } },
+          "400": { "description": "Missing tenant ID", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ValidationRules": { "type": "object", "properties": { "tenantId": { "type": "string" }, "rules": { "type": "object" } } },
+      "Error": { "type": "object", "properties": { "error": { "type": "string" }, "code": { "type": "string" }, "details": { "type": "string" } } }
+    }
+  }
+}

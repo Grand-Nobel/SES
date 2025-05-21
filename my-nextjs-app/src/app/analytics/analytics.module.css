@@ -1,0 +1,36 @@
+/* app/analytics/analytics.module.css */
+.analytics-page {
+  padding: var(--spacing-4, 16px); /* Use CSS variables for spacing */
+  font-family: var(--font-family-primary, sans-serif);
+}
+
+.analytics-page h1 {
+  font-size: var(--text-h1, 2rem); /* Use fluid typography variable */
+  margin-bottom: var(--spacing-4, 16px);
+  color: var(--color-text-heading, inherit);
+}
+
+/* Add any specific styles for the Table component container if needed */
+/* For example, if the Table itself doesn't have a border or distinct background */
+.analytics-page > div > table { /* This is a generic selector, be more specific if Table has a wrapper */
+  /* Example: border: 1px solid var(--color-border, #ccc); */
+}
+
+/* Styling for loading and error states if not using a dedicated component */
+.analytics-page [data-testid="analytics-loading"],
+.analytics-page [data-testid="analytics-error"] {
+  padding: var(--spacing-5, 20px);
+  text-align: center;
+  font-size: 1.1rem;
+  color: var(--color-text-secondary, #555);
+}
+
+.analytics-page [data-testid="analytics-error"] {
+  color: var(--color-error-text, red); /* Use error color variable */
+}
+
+.analytics-page p { /* For the 'no data' message */
+    padding: var(--spacing-4);
+    text-align: center;
+    color: var(--color-text-secondary);
+}

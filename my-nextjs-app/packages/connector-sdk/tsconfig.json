@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS", // Or ESNext if primary target is ESM
+    "lib": ["ES2020", "DOM"], // Include DOM lib if any browser-compatible utils are planned
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"]
+    },
+    "resolveJsonModule": true,
+    "experimentalDecorators": true, // If decorators are used
+    "emitDecoratorMetadata": true,  // If decorators are used with reflection
+    "moduleResolution": "node", // Or "bundler"
+    // For library development, consider these:
+    "declaration": true,        // Generate .d.ts files
+    "sourceMap": true,          // Generate source maps for debugging
+    // "declarationDir": "./dist/types", // Optional: separate dir for .d.ts files
+    "allowSyntheticDefaultImports": true // Common for interop with CommonJS modules
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.spec.ts"]
+}

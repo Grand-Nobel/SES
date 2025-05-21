@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS", // Common for CLI tools
+    "lib": ["ES2020"],    // CLIs typically don't need DOM
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".", // Adjusted for CLI structure, or use "./src" if preferred
+    "paths": {
+      "@/*": ["src/*"] // If using path aliases within src
+    },
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    // For CLI development, ensure these are suitable:
+    "sourceMap": true, // Useful for debugging transpiled JS
+    "outDir": "./dist" // Default output, though build might override
+  },
+  "include": ["src/**/*.ts", "bin/**/*.ts"], // Include both src and bin if bin contains TS
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.spec.ts", "templates"]
+}

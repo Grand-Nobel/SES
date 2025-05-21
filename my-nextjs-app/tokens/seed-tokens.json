@@ -1,0 +1,44 @@
+{
+  "colors": {
+    "background-primary": "#ffffff",
+    "text-primary": "#000000",
+    "synthesis-blue": "#0057FF",
+    "error": "#FF0000",
+    "blue-10": "#E6F0FA",
+    "blue-20": "#CCE0F5"
+  },
+  "spacing": {
+    "1": "4px",
+    "2": "8px",
+    "3": "12px",
+    "4": "16px",
+    "5": "20px",
+    "6": "24px",
+    "7": "28px",
+    "8": "32px",
+    "9": "36px",
+    "10": "40px"
+  },
+  "typography": {
+    "family-primary": "Roboto, sans-serif",
+    "family-secondary": "Open Sans, sans-serif",
+    "weight-regular": 400,
+    "weight-semibold": 600,
+    "text-body": "16px",
+    "text-caption": "12px",
+    "line-height-body": 1.5
+  },
+  "radii": {
+    "small": "4px",
+    "medium": "8px"
+  },
+  "shadows": {
+    "low": "0 1px 3px rgba(0, 0, 0, 0.1)",
+    "medium": "0 3px 6px rgba(0, 0, 0, 0.15)"
+  },
+  "motion": {
+    "duration-short": "200ms",
+    "duration-medium": "300ms",
+    "ease-standard": "ease-in-out"
+  }
+}

@@ -1,0 +1,98 @@
+/* app/notifications/notifications.module.css */
+.ses-notifications {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--color-background-primary, #fff);
+  font-family: var(--font-family-primary, sans-serif);
+  padding: var(--spacing-4, 16px);
+  color: var(--color-text-primary, #333);
+}
+
+.ses-notifications:focus {
+  outline: 2px solid var(--color-focus-ring, var(--color-synthesis-blue, #007bff));
+  outline-offset: 2px;
+}
+
+.ses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4, 16px);
+  padding-bottom: var(--spacing-3, 12px);
+  border-bottom: 1px solid var(--color-border-subtle, #eee);
+}
+
+.ses-header h1 {
+  font-size: var(--text-h1, 2rem);
+  margin: 0;
+  color: var(--color-text-heading, inherit);
+}
+
+.ses-notifications-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2, 8px);
+  overflow-y: auto; /* Allow scrolling if many notifications */
+}
+
+.ses-notifications-list p { /* For "no notifications" message */
+  text-align: center;
+  color: var(--color-text-secondary, #555);
+  padding: var(--spacing-5, 20px);
+}
+
+/* Placeholder Toast styling if not using a dedicated component's styles */
+.toast {
+  padding: var(--spacing-3, 12px);
+  border-radius: var(--border-radius-medium, 6px);
+  margin-bottom: var(--spacing-2, 8px); /* Consistent with list gap */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toast p {
+  margin: 0;
+  padding: 0; /* Reset paragraph padding within toast */
+  text-align: left; /* Align text left within toast */
+  color: inherit; /* Inherit color from toast type */
+}
+
+.toast button { /* Style for the close button in placeholder Toast */
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: inherit;
+  padding: 0 var(--spacing-1, 4px);
+  opacity: 0.7;
+}
+.toast button:hover {
+  opacity: 1;
+}
+
+.toast--info {
+  background-color: var(--color-info-background, #e0f7fa);
+  color: var(--color-info-text, #006064);
+  border-left: 4px solid var(--color-info-accent, #00bcd4);
+}
+
+.toast--success {
+  background-color: var(--color-success-background, #e8f5e9);
+  color: var(--color-success-text, #1b5e20);
+  border-left: 4px solid var(--color-success-accent, #4caf50);
+}
+
+.toast--error {
+  background-color: var(--color-error-background, #ffebee);
+  color: var(--color-error-text, #c62828);
+  border-left: 4px solid var(--color-error-accent, #f44336);
+}
+
+/* Wrapper for motion.div to ensure layout animations work smoothly */
+.notification-item-wrapper {
+  /* No specific styles needed unless for margin/padding that motion.div should handle */
+}

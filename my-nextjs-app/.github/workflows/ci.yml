@@ -1,0 +1,44 @@
+name: CI
+on:
+  push:
+    branches: [main, master] # Added master as it was in the SEED doc
+  pull_request:
+    branches: [main, master] # Added for pull requests as well
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8 # Specify pnpm version, or let it use latest
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # As per SEED doc
+          cache: 'pnpm' # Cache pnpm dependencies
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile # Use pnpm
+
+      - name: Run Lint
+        run: pnpm run lint # Assuming lint script exists
+
+      # Placeholder for Contrast Audit - requires axe-core or similar setup
+      # - name: Run Contrast Audit 
+      #   run: pnpm run audit:contrast 
+
+      # Placeholder for Snapshot Tests - requires Chromatic setup
+      # - name: Run Snapshot Tests
+      #   run: pnpm run test:snapshot --project-token=${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+
+      - name: Build Project
+        run: pnpm run build
+
+      # Placeholder for Deploy to Staging - requires Vercel or other hosting setup
+      # - name: Deploy to Staging
+      #   run: pnpm run deploy:staging

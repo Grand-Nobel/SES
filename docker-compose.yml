@@ -1,0 +1,106 @@
+version: '3.8'
+
+services:
+  connector-service:
+    build:
+      context: ./my-nextjs-app/connector-service # Path to the connector-service directory
+      dockerfile: Dockerfile
+    container_name: connector-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001" # Expose port 3001 on the host
+    env_file:
+      - ./my-nextjs-app/.env.local # Load environment variables from .env.local file
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - SUPABASE_URL=${SUPABASE_URL} # From host .env or global docker-compose .env
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY} # From host .env or global docker-compose .env
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY} # For admin operations if needed
+      - VAULT_ADDR=${VAULT_ADDR:-http://vault:8200} # Address of the Vault service
+      - VAULT_TOKEN=${VAULT_DEV_ROOT_TOKEN_ID} # For development; use AppRole or other auth in prod
+      # Add other necessary environment variables
+    depends_on:
+      - supabase # Ensure Supabase (or its Postgres DB) is up
+      - vault    # Ensure Vault is up if used for secrets
+    networks:
+      - app-network # Assuming a common network for services
+
+  marketplace-service:
+    build:
+      context: ./my-nextjs-app/marketplace-service
+      dockerfile: Dockerfile
+    container_name: marketplace-service
+    restart: unless-stopped
+    ports:
+      - "3005:3005" # As per plan
+    env_file:
+      - ./my-nextjs-app/.env.local # Or a dedicated .env for this service
+    environment:
+      - NODE_ENV=development
+      - PORT=3005
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      # SUPABASE_SERVICE_ROLE_KEY if needed for admin operations
+      # VAULT_ADDR and VAULT_TOKEN if this service needs Vault access
+    networks:
+      - app-network
+    depends_on:
+      - supabase # If direct Supabase connection, which it has
+
+  prometheus:
+    image: prom/prometheus:v2.47.0 # Or latest stable
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus/ # Mount local prometheus.yml
+      # - prometheus_data:/prometheus # Optional: persist Prometheus data
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.1.1 # Or latest stable
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    # volumes:
+      # - grafana_data:/var/lib/grafana # Optional: persist Grafana data
+      # - ./grafana/provisioning:/etc/grafana/provisioning/ # Optional: for provisioning datasources/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin # Change in production
+      - GF_USERS_ALLOW_SIGN_UP=false
+      # - GF_INSTALL_PLUGINS= # If any specific plugins are needed
+    networks:
+      - app-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  # vault:
+  #   image: hashicorp/vault:latest
+  #   container_name: vault
+  #   ports:
+  #     - "8200:8200"
+  #   environment:
+  #     VAULT_DEV_ROOT_TOKEN_ID: "myroottoken" # For dev only
+  #     VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+  #   cap_add:
+  #     - IPC_LOCK
+  #   networks:
+  #     - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+# volumes: # Optional, uncomment to persist data across restarts
+#   prometheus_data:
+#   grafana_data:

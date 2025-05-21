@@ -1,0 +1,157 @@
+{
+  "mcpServers": {
+    "github.com/modelcontextprotocol/servers/tree/main/src/github": {
+      "autoApprove": [
+        "create_or_update_file",
+        "search_repositories",
+        "create_repository",
+        "get_file_contents",
+        "push_files",
+        "create_issue",
+        "create_pull_request",
+        "fork_repository",
+        "create_branch",
+        "list_commits",
+        "list_issues",
+        "update_issue",
+        "search_code",
+        "get_pull_request",
+        "list_pull_requests",
+        "create_pull_request_review",
+        "merge_pull_request",
+        "get_pull_request_files",
+        "get_pull_request_status"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+      },
+      "transportType": "stdio"
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/git": {
+      "autoApprove": [],
+      "disabled": false,
+      "timeout": 60,
+      "command": "python",
+      "args": [
+        "-m",
+        "mcp_server_git"
+      ],
+      "transportType": "stdio"
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/puppeteer": {
+      "autoApprove": [
+        "puppeteer_navigate",
+        "puppeteer_click",
+        "puppeteer_fill",
+        "puppeteer_select",
+        "puppeteer_hover",
+        "puppeteer_evaluate"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--init",
+        "-e",
+        "DOCKER_CONTAINER=true",
+        "mcp/puppeteer"
+      ],
+      "transportType": "stdio"
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/memory": {
+      "autoApprove": [
+        "create_entities",
+        "add_observations",
+        "read_graph",
+        "open_nodes"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ],
+      "transportType": "stdio"
+    },
+    "github.com/supabase-community/supabase-mcp": {
+      "autoApprove": [
+        "list_organizations",
+        "get_organization",
+        "list_projects",
+        "get_project",
+        "get_cost",
+        "confirm_cost",
+        "create_project",
+        "list_tables",
+        "list_extensions",
+        "list_migrations",
+        "apply_migration",
+        "execute_sql",
+        "list_edge_functions",
+        "deploy_edge_function",
+        "get_logs",
+        "get_project_url",
+        "generate_typescript_types",
+        "create_branch",
+        "list_branches"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_84308495bad136f8d260f60b4ffd3a87929fa3cd"
+      ],
+      "transportType": "stdio"
+    },
+    "github.com/upstash/context7-mcp": {
+      "autoApprove": [
+        "resolve-library-id",
+        "get-library-docs"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
+      "transportType": "stdio"
+    },
+    "github.com/mendableai/firecrawl-mcp-server": {
+      "autoApprove": [
+        "firecrawl_map",
+        "firecrawl_crawl",
+        "firecrawl_search",
+        "firecrawl_extract",
+        "firecrawl_deep_research",
+        "firecrawl_check_crawl_status",
+        "firecrawl_scrape"
+      ],
+      "disabled": false,
+      "timeout": 60,
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-9c2d1c71e55f470bb362f3514769b09a"
+      },
+      "transportType": "stdio"
+    }
+  }
+}
