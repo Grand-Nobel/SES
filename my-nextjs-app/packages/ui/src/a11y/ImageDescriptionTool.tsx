@@ -85,12 +85,11 @@ export const ImageDescriptionTool: React.FC<ImageDescriptionToolProps> = ({
       <div className="image-description-tool__preview" data-testid={`${dataTestId}-preview-section`}>
         {imageSrc ? (
           // Using placeholder for now. Replace with actual AccessibleImage if available.
-          <AccessibleImagePlaceholder src={imageSrc} alt={altText} className="image-description-tool__image" describedBy={imageType === ImageType.COMPLEX && longDescription ? longDescId : undefined} />
+          (<AccessibleImagePlaceholder src={imageSrc} alt={altText} className="image-description-tool__image" describedBy={imageType === ImageType.COMPLEX && longDescription ? longDescId : undefined} />)
         ) : (
           <div className="image-description-tool__placeholder" data-testid={`${dataTestId}-image-placeholder`}>Image Preview</div>
         )}
       </div>
-      
       <div className="image-description-tool__controls">
         <div className="image-description-tool__input-group">
           <label htmlFor={`${dataTestId}-image-url`}>Image URL</label>
@@ -183,7 +182,6 @@ export const ImageDescriptionTool: React.FC<ImageDescriptionToolProps> = ({
           </button>
         </div>
       </div>
-      
       {validation && (
         <div
           className={`image-description-tool__validation ${
@@ -221,7 +219,6 @@ export const ImageDescriptionTool: React.FC<ImageDescriptionToolProps> = ({
           )}
         </div>
       )}
-      
       <div className="image-description-tool__code-output">
         <h4>Generated HTML Code Snippet</h4>
         <pre className="code" data-testid={`${dataTestId}-generated-code-snippet`}>

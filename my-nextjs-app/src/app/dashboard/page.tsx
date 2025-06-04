@@ -1,5 +1,7 @@
 'use client';
 
+import 'react'; // Explicitly import react
+import 'react-dom'; // Explicitly import react-dom
 import dynamic from 'next/dynamic';
 import React from 'react';
 

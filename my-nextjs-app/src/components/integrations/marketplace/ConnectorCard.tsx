@@ -54,9 +54,10 @@ export default function ConnectorCard({ connector, tenantId }: ConnectorCardProp
         setInstallStatus({ success: true, message: result.message || 'Installation initiated successfully!' });
         // Optionally, you might want to trigger a re-fetch of installed connectors or navigate the user.
       }
-    } catch (error: any) {
-      logger.error({ connectorId: connector.id, tenantId, error: error.message, stack: error.stack }, 'Exception during installation API call');
-      setInstallStatus({ success: false, message: `Installation error: ${error.message}` });
+    } catch (error: unknown) { // Changed any to unknown
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      logger.error({ connectorId: connector.id, tenantId, error: errorMessage, stack: error instanceof Error ? error.stack : undefined }, 'Exception during installation API call');
+      setInstallStatus({ success: false, message: `Installation error: ${errorMessage}` });
     } finally {
       setIsInstalling(false);
     }

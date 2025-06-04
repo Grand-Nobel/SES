@@ -96,7 +96,7 @@ const NotificationsContent: React.FC = () => {
         await supabase.from('system_metrics').insert({
           tenant_id: authTenantId,
           metric: 'notification_added',
-          value: maskedEvent as any,
+          value: maskedEvent as unknown as Record<string, unknown>, // More specific than any
         });
         announcer.announce(t('aria.notification_added', 'New notification added'), authTenantId, true);
       }

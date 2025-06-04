@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: supavisor
+  namespace: default # Or a dedicated database namespace
+  labels:
+    app: supavisor
+spec:
+  replicas: 2 # Configurable via HPA
+  selector:
+    matchLabels:
+      app: supavisor
+  template:
+    metadata:
+      labels:
+        app: supavisor
+    spec:
+      containers:
+      - name: supavisor
+        image: supabase/supavisor:latest # Example image
+        env:
+        - name: SUPAVISOR_JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: supavisor-jwt-secret # Kubernetes secret for JWT
+              key: jwt_secret
+        - name: SUPAVISOR_DEFAULT_POOL_SIZE
+          value: "20"
+        - name: SUPAVISOR_MAX_CLIENT_CONN
+          value: "10000"
+        - name: SUPAVISOR_MAX_DB_CONNECTIONS
+          value: "200"
+        - name: SUPAVISOR_IDLE_TIMEOUT
+          value: "600"
+        - name: SUPAVISOR_POOL_MODE
+          value: "transaction"
+        - name: SUPAVISOR_AUTH_CLAIMS_NAMESPACE
+          value: "app"
+        - name: SUPAVISOR_SESSION_VARIABLES
+          value: '[{"name": "app.current_tenant_id", "claim": "tenant_id"}, {"name": "app.current_user_id", "claim": "sub"}, {"name": "app.current_role", "claim": "role"}]'
+        - name: SUPAVISOR_QUERY_MANAGEMENT_DEFAULT_TIMEOUT
+          value: "30000"
+        - name: SUPAVISOR_QUERY_MANAGEMENT_MAX_STATEMENT_TIMEOUT
+          value: "120000"
+        - name: SUPAVISOR_READ_REPLICAS_ENABLED
+          value: "true"
+        - name: SUPAVISOR_READ_REPLICAS_TARGET_ROLES
+          value: "app_readonly"
+        - name: SUPAVISOR_READ_REPLICAS_TRANSACTION_MODES
+          value: "READ ONLY"
+        ports:
+        - containerPort: 6543
+          name: supavisor
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: supavisor
+  namespace: default # Or a dedicated database namespace
+  labels:
+    app: supavisor
+spec:
+  ports:
+  - port: 6543
+    targetPort: 6543
+    protocol: TCP
+    name: supavisor
+  selector:
+    app: supavisor
+  type: ClusterIP # Or LoadBalancer if exposing externally
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: supavisor-hpa
+  namespace: default # Or a dedicated database namespace
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: supavisor
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  # Example: Custom metric for active connections (requires Prometheus adapter)
+  # - type: Pods
+  #   pods:
+  #     metric:
+  #       name: supavisor_active_client_connections
+  #     target:
+  #       type: AverageValue
+  #       averageValue: 100

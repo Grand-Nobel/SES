@@ -26,7 +26,13 @@ export interface Widget { // Added export keyword
   y: number;
   w: number;
   h: number;
-  config: { title: string; value?: number; trend?: 'up' | 'down' };
+  config: {
+    title: string;
+    value?: number;
+    trend?: 'up' | 'down';
+    icon?: React.ReactElement<{ size?: number }>;
+    chartType?: string;
+  };
 }
 
 interface Annotation {

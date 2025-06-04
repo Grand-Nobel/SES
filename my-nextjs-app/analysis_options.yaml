@@ -1,0 +1,10 @@
+# analysis_options.yaml
+include: package:flutter_lints/flutter.yaml
+linter:
+  rules:
+    prefer_app_widgets: true
+custom_lints:
+  prefer_app_widgets:
+    description: Enforce use of design system widgets
+    pattern: MaterialButton|RaisedButton
+    replacement: AppButton

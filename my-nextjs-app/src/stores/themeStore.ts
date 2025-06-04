@@ -1,5 +1,5 @@
 // my-nextjs-app/src/stores/themeStore.ts
-import { create, StoreApi, UseBoundStore } from 'zustand'; // Changed to named import
+import { create } from 'zustand'; // StoreApi and UseBoundStore are unused
 
 interface ThemeState {
   primaryColor: string;
@@ -17,7 +17,7 @@ let storeState = {
   error: null as string | null, // Explicitly type null
 };
 
-export const useThemeStore = create<ThemeState>((set: (partial: Partial<ThemeState> | ((state: ThemeState) => Partial<ThemeState>)) => void, get: () => ThemeState) => ({
+export const useThemeStore = create<ThemeState>((set: (partial: Partial<ThemeState> | ((state: ThemeState) => Partial<ThemeState>)) => void, /*get: () => ThemeState*/) => ({ // get is unused
   ...storeState,
   initialize: async (tenantId: string) => {
     console.log(`Mock themeStore initialize called for tenant: ${tenantId}`);

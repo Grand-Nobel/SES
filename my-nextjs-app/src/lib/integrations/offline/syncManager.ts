@@ -71,8 +71,10 @@ async function processQueue() {
           await offlineQueue.deleteAction(action.id); // Or move to a "dead letter" queue
         }
       }
-    } catch (error: any) {
-      logger.error({ actionId: action.id, error: error.message, stack: error.stack }, 'Network or unexpected error processing action.');
+    } catch (error: unknown) { // Changed any to unknown
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      logger.error({ actionId: action.id, error: errorMessage, stack: errorStack }, 'Network or unexpected error processing action.');
       if (action.retries < MAX_RETRIES) {
         action.retries += 1;
         await offlineQueue.updateActionRetries(action.id, action.retries);
@@ -97,7 +99,7 @@ async function processQueue() {
   
   // If there are still items and we are online, try again after a delay
   // This handles cases where an item was retried and broke the loop
-  if (online && await offlineQueue.getNextAction()) {
+  if (online && (await offlineQueue.getNextAction())) {
     setTimeout(triggerSync, RETRY_DELAY_MS);
   }
 }

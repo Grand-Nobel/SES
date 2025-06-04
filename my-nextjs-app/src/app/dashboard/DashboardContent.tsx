@@ -71,11 +71,8 @@ const DashboardContent: React.FC = () => {
   const [showConsentModal, setShowConsentModal] = useState(false);
   const [hasConsented, setHasConsented] = useState(false);
 
-  const authTenantIdFromHook = useAuthStore(state => state.tenantId);
-  const authUserFromHook = useAuthStore(state => state.user);
-  const initializeAuth = useAuthStore.initialize; 
-  const authIsLoadingState = useAuthStore(state => state.isLoading); 
-  
+  // Unconditional hook calls
+  const { tenantId: currentAuthTenantId, user: currentAuthUser, initialize: initializeAuth, isLoading: currentAuthIsLoading } = useAuthStore();
   const { initialize: initializeThemeAction, error: themeErrorState } = useThemeStore();
   const { isHighZoom: isHighZoomState, initialize: initializeZoomAction } = useTextZoomStore();
 
@@ -139,17 +136,16 @@ const DashboardContent: React.FC = () => {
       const startTime = Date.now();
       try {
         await Promise.race([
-          initializeAuth(), // Corrected: was authInitializeAction
+          initializeAuth(),
           new Promise((_, reject) => setTimeout(() => reject(new Error('Authentication timed out')), AUTH_TIMEOUT)),
         ]);
         
-        const currentAuthState = useAuthStore.getState();
-        if (!currentAuthState.tenantId) {
+        if (!currentAuthTenantId) {
           throw new Error('Failed to initialize tenant ID');
         }
         setIsAuthLoaded(true);
-        const currentTenantId = currentAuthState.tenantId; // Now a string
-        const currentUserId = currentAuthState.user?.id;
+        const currentTenantId = currentAuthTenantId;
+        const currentUserId = currentAuthUser?.id;
 
         // All subsequent calls requiring tenantId are now safe
         await fetchInitialData(currentTenantId, currentUserId);
@@ -240,7 +236,7 @@ const DashboardContent: React.FC = () => {
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error during initialization';
         setError(t('error.page_load', { message: errorMessage }));
-        const finalTenantId = useAuthStore.getState().tenantId;
+        const finalTenantId = currentAuthTenantId; // Use the hook value
         captureMessage('Page initialization failed', { extra: { error: errorMessage, tenantId: finalTenantId } });
         announcer.announce(t('error.page_load_aria', {message: "Page failed to load"}), finalTenantId, true);
       }
@@ -255,8 +251,8 @@ const DashboardContent: React.FC = () => {
   }, []); 
 
   const handleSaveCustomColor = async () => {
-    const currentTenantId = useAuthStore.getState().tenantId; // Get current tenantId
-    if (!currentTenantId) { 
+    // Use the hook value directly
+    if (!currentAuthTenantId) { 
         setError("Tenant ID not available for saving theme.");
         return;
     }
@@ -264,34 +260,29 @@ const DashboardContent: React.FC = () => {
       const encryptedTokens = await encryptTokens({ primaryColor: customColor });
       const { error: upsertError } = await supabase
         .from('tenant_themes')
-        .upsert({ tenant_id: currentTenantId, tokensEncrypted: encryptedTokens, version: '1.0.0' });
+        .upsert({ tenant_id: currentAuthTenantId, tokensEncrypted: encryptedTokens, version: '1.0.0' });
       if (upsertError) throw upsertError;
       document.documentElement.style.setProperty('--color-synthesis-blue', customColor);
       setRegionConfig({ ...regionConfig, primaryColor: customColor });
       setShowConsentModal(false);
-      const currentUser = useAuthStore.getState().user; // Get current user
-      const maskedEvent = await logger.maskPersonalData({ tenantId: currentTenantId, userId: currentUser?.id, primaryColor: customColor });
+      // Use the hook value directly
+      const maskedEvent = await logger.maskPersonalData({ tenantId: currentAuthTenantId, userId: currentAuthUser?.id, primaryColor: customColor });
       await supabase.from('system_metrics').insert({
-        tenant_id: currentTenantId,
+        tenant_id: currentAuthTenantId,
         metric: 'theme_customized',
         value: maskedEvent as any,
       });
-      announcer.announce(t('aria.theme_saved'), currentTenantId, false);
+      announcer.announce(t('aria.theme_saved'), currentAuthTenantId, false);
     } catch (err) {
       setError(t('error.theme_save_failed'));
-      captureMessage('Theme save failed', { extra: { error: err, tenantId: currentTenantId } });
+      captureMessage('Theme save failed', { extra: { error: err, tenantId: currentAuthTenantId } });
     }
   };
 
-  const currentAuthIsLoading = useAuthStore(state => state.isLoading); // Use reactive value for render logic
-
-  if (currentAuthIsLoading || !isDataLoaded) { 
+  if (currentAuthIsLoading || !isDataLoaded) {
     return <LoadingState data-testid="dashboard-page-loading" message={t('loading', 'Loading Dashboard...')} />;
   }
   
-  const currentAuthTenantId = useAuthStore(state => state.tenantId); // Use reactive value for render logic
-  const currentAuthUser = useAuthStore(state => state.user); // Use reactive value for render logic
-
   if (!currentAuthTenantId) {
     return <div role="alert">{t('error.auth_failed', 'Authentication failed. Tenant ID is missing.')}</div>;
   }
@@ -368,20 +359,22 @@ const DashboardContent: React.FC = () => {
               </Suspense>
             </section>
             <section className="ses-kpis" aria-label={t('aria.kpis')}>
-              <div className="ses-grid">
-                {kpis.length > 0 ? (
-                  kpis.map((kpi, index) => (
-                    <KpiCard
-                      key={index}
-                      title={kpi.title}
-                      value={kpi.value}
-                      trend={kpi.trend}
-                    />
-                  ))
-                ) : (
-                  <p>{t('no_kpis', 'No KPIs available at the moment.')}</p>
-                )}
-              </div>
+              <Suspense fallback={<LoadingState message="Loading KPIs..." />}>
+                <div className="ses-grid">
+                  {kpis.length > 0 ? (
+                    kpis.map((kpi, index) => (
+                      <KpiCard
+                        key={index}
+                        title={kpi.title}
+                        value={kpi.value}
+                        trend={kpi.trend}
+                      />
+                    ))
+                  ) : (
+                    <p>{t('no_kpis', 'No KPIs available at the moment.')}</p>
+                  )}
+                </div>
+              </Suspense>
             </section>
           </motion.div>
         )}

@@ -51,7 +51,7 @@ const ThemesContent: React.FC = () => {
             } else if (tenantData.tokensEncrypted) {
               // If only encrypted tokens are stored, decrypt to get the color
               const decrypted = await decryptTokens(tenantData.tokensEncrypted);
-              if (decrypted?.primaryColor) {
+              if (decrypted?.primaryColor && typeof decrypted.primaryColor === 'string') {
                 colorToSet = decrypted.primaryColor;
               }
             }
@@ -105,7 +105,7 @@ const ThemesContent: React.FC = () => {
       await supabase.from('system_metrics').insert({
         tenant_id: authTenantId,
         metric: 'theme_customized',
-        value: maskedEvent as any,
+        value: maskedEvent as unknown as Record<string, unknown>, // More specific than any
       });
       announcer.announce(t('aria.theme_saved', 'Theme saved successfully'), authTenantId, false);
     } catch (err) {
@@ -185,7 +185,7 @@ const ThemesContent: React.FC = () => {
 };
 
 // Helper function placeholder for decryptTokens if not already available
-async function decryptTokens(encryptedData: string): Promise<Record<string, any> | null> {
+async function decryptTokens(encryptedData: string): Promise<Record<string, unknown> | null> { // Changed any to unknown
     if (encryptedData.startsWith('mock-encrypted:')) {
         const base64Part = encryptedData.replace('mock-encrypted:', '');
         const reversed = typeof window !== 'undefined' ? atob(base64Part) : Buffer.from(base64Part, 'base64').toString('utf-8');

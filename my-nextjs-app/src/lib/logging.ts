@@ -3,31 +3,40 @@ import pino from 'pino';
 // Determine if running in a browser environment
 const isBrowser = typeof window !== 'undefined';
 
-// Simplified logger for diagnosis
-const createLogger = () => {
+// Define a custom logger interface that extends pino.Logger
+interface CustomLogger extends pino.Logger {
+  withContext: (context: Record<string, unknown>) => CustomLogger; // Changed any to unknown
+}
+
+const createLogger = (): CustomLogger => {
+  let baseLogger: pino.Logger;
+
   if (isBrowser) {
     // For client-side, pino can be configured with browser options
-    return pino({
+    baseLogger = pino({
       level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
       browser: {
         asObject: true,
       },
     });
   } else {
-    // For server-side (including Server Components), completely bypass pino for diagnosis.
-    // Use console directly.
-    const consoleLogger = {
-      info: (...args: any[]) => console.log('[SSR-INFO]', ...args),
-      warn: (...args: any[]) => console.warn('[SSR-WARN]', ...args),
-      error: (...args: any[]) => console.error('[SSR-ERROR]', ...args),
-      debug: (...args: any[]) => console.debug('[SSR-DEBUG]', ...args),
-      fatal: (...args: any[]) => console.error('[SSR-FATAL]', ...args),
-      trace: (...args: any[]) => console.trace('[SSR-TRACE]', ...args),
-      silent: () => {},
-      child: () => consoleLogger, // Return self for basic child compatibility
-    };
-    return consoleLogger as unknown as pino.Logger; // Cast to satisfy pino.Logger type expectation
+    // For server-side, use pino with JSON output
+    baseLogger = pino({
+      level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+      formatters: {
+        level: (label) => ({ level: label }),
+      },
+      timestamp: pino.stdTimeFunctions.isoTime,
+    });
   }
+
+  // Extend the base logger with a `withContext` method
+  const customLogger = baseLogger as CustomLogger;
+  customLogger.withContext = function (context: Record<string, unknown>): CustomLogger {
+    return this.child(context) as CustomLogger;
+  };
+
+  return customLogger;
 };
 
 const logger = createLogger();
@@ -39,12 +48,12 @@ export default logger;
  * depending on specific privacy logging requirements.
  */
 export const PrivacyLogger = () => ({
-  log: async (eventName: string, payload: any) => {
+  log: async (eventName: string, payload: Record<string, unknown>) => { // Changed any to Record<string, unknown>
     // Use the main logger instance or a dedicated privacy-focused one
     logger.info({ eventName, privacyPayload: payload, type: 'privacy' }, `Privacy Event: ${eventName}`);
     // In a real application, this might have different transport or redaction rules.
   },
-  maskPersonalData: async (data: any) => {
+  maskPersonalData: async (data: Record<string, unknown>) => { // Changed any to Record<string, unknown>
     // Implement actual data masking logic here
     logger.debug({ dataToMask: data, type: 'privacy' }, "Masking personal data (placeholder)");
     // Example: return a new object with sensitive fields masked

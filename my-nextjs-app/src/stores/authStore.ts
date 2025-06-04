@@ -1,5 +1,5 @@
 // my-nextjs-app/src/stores/authStore.ts
-import { create, StoreApi } from 'zustand';
+import { create } from 'zustand'; // StoreApi is unused
 
 interface User {
   id?: string;

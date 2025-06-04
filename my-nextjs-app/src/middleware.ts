@@ -36,8 +36,21 @@ export async function middleware(request: NextRequest) {
       // return NextResponse.redirect(new URL('/tenant-select', request.url)); // Uncomment if tenant selection is implemented
     }
   }
+ 
+   const response = NextResponse.next();
 
-  return NextResponse.next();
+  // Apply security headers as per 8.4.2.5 Security Headers
+  response.headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';");
+  response.headers.set('Strict-Transport-Security', "max-age=63072000; includeSubDomains; preload");
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Feature-Policy', "geolocation 'none'; microphone 'none'; camera 'none'; payment 'none';");
+  response.headers.set('Cache-Control', 'private, no-store, max-age=0');
+  response.headers.set('Pragma', 'no-cache');
+  response.headers.set('Expires', '0');
+
+  return response;
 }
 
 export const config = {
@@ -57,7 +70,7 @@ export const config = {
     '/notifications/:path*',
     '/settings/:path*',
     '/integrations/:path*', 
-    '/marketplace/:path*', 
+    '/marketplace/:path*', // Restore marketplace to protected routes
     '/auth/signin', // To redirect if already authenticated
     // '/tenant-select', // If you have this page
   ],

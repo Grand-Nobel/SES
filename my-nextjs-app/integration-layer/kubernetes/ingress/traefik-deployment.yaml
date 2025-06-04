@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+  namespace: default # Or a dedicated ingress namespace
+  labels:
+    app: traefik
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      containers:
+      - name: traefik
+        image: traefik:v2.10 # Example image
+        args:
+          - --api.dashboard=true
+          - --providers.kubernetesingress
+          - --entrypoints.web.address=:80
+          - --entrypoints.websecure.address=:443
+          - --entrypoints.websecure.http.tls
+          - --certificatesresolvers.le.acme.email=your-email@example.com # Replace with actual email
+          - --certificatesresolvers.le.acme.storage=/data/acme.json
+          - --certificatesresolvers.le.acme.tlschallenge # Or httpchallenge/dnschallenge
+        ports:
+          - containerPort: 80
+            name: web
+          - containerPort: 443
+            name: websecure
+          - containerPort: 8080
+            name: api
+        volumeMounts:
+          - name: data
+            mountPath: /data
+      volumes:
+        - name: data
+          emptyDir: {} # For ACME storage, should be persistent in production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik
+  namespace: default # Or a dedicated ingress namespace
+  labels:
+    app: traefik
+spec:
+  selector:
+    app: traefik
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: web
+    - port: 443
+      targetPort: 443
+      protocol: TCP
+      name: websecure
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: api
+  type: LoadBalancer

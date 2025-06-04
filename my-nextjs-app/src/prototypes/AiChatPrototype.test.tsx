@@ -3,7 +3,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom'; // Import jest-dom for extended matchers
 import AiChatPrototype from './AiChatPrototype';
-import { supabase } from '@/lib/supabase';
+// import { supabase } from '@/lib/supabase'; // supabase is unused
 import { PrivacyLogger } from '@/lib/logging';
 import * as Tesseract from 'tesseract.js'; // Import as namespace
 import { agentRunner } from '@/lib/agents';

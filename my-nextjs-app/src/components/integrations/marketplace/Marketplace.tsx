@@ -1,6 +1,6 @@
 import logger from '@/lib/logging';
 import ConnectorCard from './ConnectorCard';
-import { Suspense } from 'react';
+// import { Suspense } from 'react'; // Suspense is unused
 
 interface MarketplaceConnector {
   id: string;
@@ -57,7 +57,22 @@ export default async function Marketplace() {
   
   // Note: Error handling for fetchMarketplaceConnectors will be caught by the nearest error.tsx
   // or a custom ErrorBoundary if wrapped.
-  const connectors = await fetchMarketplaceConnectors(MOCK_TENANT_ID);
+  let connectors: MarketplaceConnector[] = [];
+  try {
+    connectors = await fetchMarketplaceConnectors(MOCK_TENANT_ID);
+  } catch (error: unknown) { // Changed any to unknown
+    const errorMessage = error instanceof Error ? error.message : 'Failed to load connectors';
+    logger.error({ error: errorMessage, tenantId: MOCK_TENANT_ID }, 'Marketplace page failed to load connectors');
+    // Render an error state or allow error.tsx to handle it
+    // For now, returning a message directly:
+    return (
+      <div className="p-4">
+        <h2 className="text-2xl font-semibold mb-4">Integration Marketplace</h2>
+        <p className="text-red-500">Error loading connectors: {errorMessage}</p>
+      </div>
+    );
+  }
+
 
   if (!connectors || connectors.length === 0) {
     return (

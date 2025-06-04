@@ -12,7 +12,7 @@ interface QueuedAction {
   timestamp: number;
   tenantId: string;
   actionType: string; // e.g., 'INSTALL_CONNECTOR', 'UPDATE_CONFIG', 'SYNC_DATA'
-  payload: any; // Data related to the action
+  payload: Record<string, unknown>; // Data related to the action, changed any to Record<string, unknown>
   endpoint: string; // The API endpoint to call when online
   method: 'POST' | 'PUT' | 'DELETE' | 'PATCH'; // HTTP method
   retries: number;

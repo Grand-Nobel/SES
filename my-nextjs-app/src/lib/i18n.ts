@@ -1,27 +1,40 @@
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
+import { createTranslator } from 'next-intl';
+import { supabase } from './supabase';
+import { get, set } from 'idb-keyval';
 
-// Import translation files
-import en from '../../locales/en/common.json';
-import ar from '../../locales/ar/common.json';
+export async function getTranslator(locale: string, namespace: string, agentHint?: string) {
+  const effectiveLocale = agentHint || locale;
+  const cacheKey = `translations_${effectiveLocale}_${namespace}`;
+  const cached = await get(cacheKey);
+  if (cached && cached.expires > Date.now()) {
+    return createTranslator({ locale: effectiveLocale, namespace, messages: cached.translations });
+  }
 
-i18n
-  .use(initReactI18next) // passes i18n to react-i18next
-  .init({
-    resources: {
-      en: {
-        common: en,
-      },
-      ar: {
-        common: ar,
-      },
-    },
-    lng: 'en', // default language
-    fallbackLng: 'en',
+  const { data: messagesData, error: messagesError } = await supabase
+    .from('translations')
+    .select('key, value')
+    .eq('locale', effectiveLocale)
+    .eq('namespace', namespace);
 
-    interpolation: {
-      escapeValue: false, // react already safes from xss
-    },
+  let translations = Object.fromEntries(messagesData?.map(({ key, value }) => [key, value]) ?? []);
+
+  if (messagesError || !messagesData?.length) {
+    console.warn(`No translations found for locale ${effectiveLocale}, namespace ${namespace}. Falling back to 'en'.`, messagesError);
+    const { data: fallbackData, error: fallbackError } = await supabase
+      .from('translations')
+      .select('key, value')
+      .eq('locale', 'en')
+      .eq('namespace', namespace);
+    translations = Object.fromEntries(fallbackData?.map(({ key, value }) => [key, value]) ?? []);
+    if (fallbackError) {
+      console.error('Error fetching fallback translations:', fallbackError);
+    }
+  }
+
+  await set(cacheKey, {
+    translations,
+    expires: Date.now() + 24 * 60 * 60 * 1000,
   });
 
-export default i18n;
+  return createTranslator({ locale: effectiveLocale, namespace, messages: translations });
+}

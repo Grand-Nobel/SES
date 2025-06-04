@@ -1,6 +1,6 @@
-import { create, StateCreator } from 'zustand'; // Import StateCreator for typing 'set'
-import { supabase } from '@/lib/supabase';
-import { PrivacyLogger } from '@/lib/logging';
+import { create } from 'zustand'; // StateCreator, supabase, PrivacyLogger, set, tenantId are unused
+// import { supabase } from '@/lib/supabase'; // supabase is unused
+// import { PrivacyLogger } from '@/lib/logging'; // PrivacyLogger is unused
 // Corrected relative path assuming standard project structure where src and packages are siblings
 // import { observeTextZoom } from '../../packages/ui/src/a11y/text-scaling'; // Commented out as function is missing
 
@@ -8,15 +8,15 @@ interface TextZoomState {
   zoomLevel: number;
   isZoomed: boolean;
   isHighZoom: boolean;
-  initialize: (tenantId: string) => () => void; // Return type for cleanup
+  initialize: (_tenantId: string) => () => void; // Return type for cleanup, _tenantId is unused
   // No explicit set method needed here if initialize handles all updates
 }
 
-export const useTextZoomStore = create<TextZoomState>((set) => ({
+export const useTextZoomStore = create<TextZoomState>((/*set*/) => ({ // set is unused
   zoomLevel: 1,
   isZoomed: false,
   isHighZoom: false,
-  initialize: (tenantId: string) => {
+  initialize: (_tenantId: string) => { // _tenantId is unused
     // Ensure this runs only in the browser
     // Ensure this runs only in the browser
     if (typeof window === 'undefined') {

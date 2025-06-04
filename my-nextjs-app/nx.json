@@ -1,0 +1,18 @@
+{
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "test", "lint"]
+      }
+    }
+  },
+  "targetDependencies": {
+    "build": [
+      { "target": "build", "projects": "dependencies" }
+    ]
+  },
+  "implicitDependencies": {
+    "packages/ui/*": ["!packages/domain/*"]
+  }
+}

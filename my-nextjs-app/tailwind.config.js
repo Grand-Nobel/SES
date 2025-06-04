@@ -1,6 +1,10 @@
 // tailwind.config.js
 module.exports = {
-  content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}', './packages/ui/src/**/*.{js,ts,jsx,tsx}'],
+  content: [
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './packages/ui/src/**/*.{js,ts,jsx,tsx,mdx}', // Assuming this path is correct for your UI package
+  ],
   theme: {
     extend: {
       colors: {

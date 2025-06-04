@@ -1,0 +1,74 @@
+# integration-layer/helm/ses-orchestration/values.yaml
+
+# Global settings if any (e.g., imagePullSecrets, global.replicaCount)
+# global:
+#   imagePullSecrets: []
+#   replicaCount: 1
+
+# Kafka dependency values (overrides for the Bitnami Kafka chart)
+kafka:
+  enabled: true # Controls whether Kafka is deployed as part of this chart
+  # fullnameOverride: ses-kafka # Optional: if you want a custom name for Kafka resources
+  replicas: 3 # Number of Kafka brokers
+  # Example of other Kafka values you might want to override:
+  # zookeeper:
+  #   replicaCount: 3
+  # persistence:
+  #   size: 10Gi
+
+# Redis dependency values (overrides for the Bitnami Redis chart)
+redis:
+  enabled: true # Controls whether Redis is deployed as part of this chart
+  # fullnameOverride: ses-redis # Optional
+  architecture: standalone # Or "replication" for master-slave setup
+  auth:
+    enabled: false # Set to true and provide a password/secret if needed
+  # master:
+  #   persistence:
+  #     size: 5Gi
+
+# Custom application components
+orchestrator:
+  enabled: true
+  name: orchestrator
+  replicas: 2
+  image:
+    repository: your-repo/orchestrator # Replace with your image repository
+    tag: latest # Or a specific version
+    pullPolicy: IfNotPresent
+  # service:
+  #   type: ClusterIP
+  #   port: 80
+  # resources: {}
+  #   limits:
+  #     cpu: 500m
+  #     memory: 512Mi
+  #   requests:
+  #     cpu: 250m
+  #     memory: 256Mi
+
+agentRunner: # Assuming this is for the agent-runner component
+  enabled: true
+  name: agent-runner
+  replicas: 2
+  image:
+    repository: your-repo/agent-runner # Replace with your image repository
+    tag: latest # Or a specific version
+    pullPolicy: IfNotPresent
+  # service:
+  #   type: ClusterIP
+  #   port: 80
+  # resources: {}
+
+# Supabase external service configuration (used by supabase.yaml template)
+supabase:
+  externalName: supabase.ses.com # The external DNS name of your Supabase instance
+  # port: 443 # Optional, if you need to specify a port for the service object
+
+# Add other application-specific configurations here
+# For example, if you have other microservices deployed by this chart:
+# kpiModelService:
+#   enabled: true
+#   replicas: 1
+#   image: your-repo/kpi-model-service:latest
+#   ...

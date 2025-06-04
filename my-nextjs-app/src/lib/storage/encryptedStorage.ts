@@ -1,5 +1,5 @@
 import { openDB, IDBPDatabase } from 'idb';
-import * as SWR from 'swr';
+// import * as SWR from 'swr'; // SWR is unused
 import { encryptTokens, decryptTokens } from '@/utils/encrypt'; // Assuming these utilities exist
 
 const dbPromise = openDB('ses-db', 1, {
@@ -8,15 +8,15 @@ const dbPromise = openDB('ses-db', 1, {
   },
 });
 
-export async function encryptAndStore(key: string, data: any) {
+export async function encryptAndStore(key: string, data: Record<string, unknown>) { // Changed any to Record<string, unknown>
   const encrypted = await encryptTokens(data);
   const db = await dbPromise;
   await db.put('cache', encrypted, key);
 }
 
-export async function decryptAndRetrieve(key: string) {
+export async function decryptAndRetrieve(key: string): Promise<Record<string, unknown> | null> { // Added return type
   const db = await dbPromise;
-  const encrypted = await db.get('cache', key);
+  const encrypted = await db.get('cache', key) as string | undefined; // Assuming encrypted is a string
   if (!encrypted) return null;
   return decryptTokens(encrypted);
 }

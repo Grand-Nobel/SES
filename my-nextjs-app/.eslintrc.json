@@ -1,0 +1,16 @@
+{
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["**/domain/**"],
+            "importNames": ["*"],
+            "message": "UI packages cannot import domain logic"
+          }
+        ]
+      }
+    ]
+  }
+}

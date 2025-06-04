@@ -1,0 +1,33 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: agent-runner-hpa
+  labels:
+    app: agent-runner
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: agent-runner # Must match the deployment name
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  # Example for scaling based on Kafka consumer lag (requires KEDA or a custom metrics adapter)
+  # - type: External
+  #   external:
+  #     metric:
+  #       name: kafka_consumergroup_lag_sum # This name depends on your metrics provider
+  #       selector: # Match labels for the specific consumer group/topic
+  #         matchLabels:
+  #           topic: "agent-tasks"
+  #           group: "agent-group-example-agent-001" # Be specific if HPA is per agent type
+  #     target:
+  #       type: AverageValue # Target average lag per pod
+  #       averageValue: "100" # e.g., scale up if average lag per pod > 100
+  # Ensure your metrics server (e.g., Prometheus Adapter, KEDA) is configured to provide these metrics.

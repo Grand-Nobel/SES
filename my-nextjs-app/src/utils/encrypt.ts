@@ -5,7 +5,7 @@
 // Ensure that key management is secure. For client-side encryption, keys might
 // be derived or provided securely. For server-side, keys should be stored securely.
 
-const MOCK_ENCRYPTION_KEY = 'mock-super-secret-key-do-not-use-in-prod';
+// const MOCK_ENCRYPTION_KEY = 'mock-super-secret-key-do-not-use-in-prod'; // MOCK_ENCRYPTION_KEY is unused
 
 /**
  * Placeholder for an encryption function.
@@ -13,7 +13,7 @@ const MOCK_ENCRYPTION_KEY = 'mock-super-secret-key-do-not-use-in-prod';
  * @param data The data object to encrypt.
  * @returns A promise that resolves to the encrypted string (e.g., base64 or hex).
  */
-export async function encryptTokens(data: Record<string, any>): Promise<string> {
+export async function encryptTokens(data: Record<string, unknown>): Promise<string> { // Changed any to unknown
   console.warn('encryptTokens: Using MOCK encryption. DO NOT USE IN PRODUCTION.');
   try {
     const stringifiedData = JSON.stringify(data);
@@ -32,7 +32,7 @@ export async function encryptTokens(data: Record<string, any>): Promise<string> 
  * @param encryptedData The encrypted string.
  * @returns A promise that resolves to the decrypted data object.
  */
-export async function decryptTokens(encryptedData: string): Promise<Record<string, any> | null> {
+export async function decryptTokens(encryptedData: string): Promise<Record<string, unknown> | null> { // Changed any to unknown
   console.warn('decryptTokens: Using MOCK decryption. DO NOT USE IN PRODUCTION.');
   if (!encryptedData.startsWith('mock-encrypted:')) {
     console.error('Invalid mock encrypted data format');

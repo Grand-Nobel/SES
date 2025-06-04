@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports: ['3000:3000']
+    environment:
+      - SUPABASE_URL=http://supabase:3000
+  supabase:
+    image: supabase/supabase
+    ports: ['5432:5432']
+    environment:
+      - POSTGRES_PASSWORD=secret

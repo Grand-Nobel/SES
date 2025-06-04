@@ -1,0 +1,69 @@
+# integration-layer/logging/promtail-config.yaml
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0 # Disabled by default, Promtail typically pushes via HTTP
+
+positions:
+  filename: /tmp/positions.yaml # Path where Promtail stores its read positions
+
+client: # Changed from 'clients' to 'client' as per common Promtail config structure for a single Loki instance
+  url: http://loki:3100/loki/api/v1/push # URL of the Loki instance
+  # batchwait: 1s # Optional: Max time to wait before sending a batch
+  # batchsize: 102400 # Optional: Max batch size in bytes
+
+scrape_configs:
+  - job_name: orchestrator
+    static_configs:
+      - targets:
+          - localhost # Assumes Promtail runs on the same host or has access to orchestrator logs
+        labels:
+          job: orchestrator
+          app: ses-orchestration # Added app label for better context
+          component: orchestrator
+          __path__: /var/log/orchestrator/*.log # Path to orchestrator log files
+          # You might need to adjust the path depending on where orchestrator logs are written.
+          # If running in Kubernetes, this might be a path within the orchestrator pod's filesystem,
+          # and Promtail would typically run as a DaemonSet or sidecar.
+
+  - job_name: agent-runner
+    static_configs:
+      - targets:
+          - localhost # Similar assumption as above for agent-runner logs
+        labels:
+          job: agent-runner
+          app: ses-orchestration # Added app label
+          component: agent-runner
+          __path__: /var/log/agent-runner/*.log # Path to agent-runner log files
+
+  # Example for scraping Kubernetes pod logs (if Promtail is running in cluster)
+  # - job_name: kubernetes-pods
+  #   kubernetes_sd_configs:
+  #     - role: pod
+  #   relabel_configs:
+  #     - source_labels:
+  #         - __meta_kubernetes_pod_label_app_kubernetes_io_name # Example: if your pods have this label
+  #       target_label: app
+  #     - source_labels:
+  #         - __meta_kubernetes_pod_label_app_kubernetes_io_component
+  #       target_label: component
+  #     - source_labels:
+  #         - __meta_kubernetes_pod_node_name
+  #       target_label: node_name
+  #     - source_labels:
+  #         - __meta_kubernetes_namespace
+  #       target_label: namespace
+  #     - source_labels:
+  #         - __meta_kubernetes_pod_name
+  #       target_label: pod
+  #     - source_labels:
+  #         - __meta_kubernetes_pod_container_name
+  #       target_label: container
+  #     - replacement: /var/log/pods/*$1/*.log # Path to container logs on the node
+  #       source_labels:
+  #         - __meta_kubernetes_pod_uid
+  #         - __meta_kubernetes_pod_container_name
+  #       target_label: __path__
+  #     # Only scrape logs from pods labeled for SES orchestration
+  #     - action: keep
+  #       source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+  #       regex: ses-orchestration # Assuming your Helm chart labels pods with instance=ses-orchestration

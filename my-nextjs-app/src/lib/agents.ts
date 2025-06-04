@@ -1,6 +1,21 @@
 // Placeholder for agentRunner
+interface AgentRunParams {
+  payload?: {
+    userInput?: string;
+    // Add other expected payload properties
+  };
+  // Add other expected param properties
+  [key: string]: unknown; // Allows for other properties
+}
+
+interface AgentRunResult {
+  success: boolean;
+  data: Record<string, unknown>; // Or a more specific type for data
+  message?: string;
+}
+
 export const agentRunner = {
-  run: async (params: any): Promise<{ success: boolean; data: any; message?: string }> => {
+  run: async (params: AgentRunParams): Promise<AgentRunResult> => {
     console.log("Mock agentRunner.run called with:", params);
     // In a real application, this would interact with an agent system
     // Simulate a response that includes a message

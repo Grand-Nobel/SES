@@ -1,26 +1,36 @@
-// my-nextjs-app/src/lib/api/offlineMutationManager.ts
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
+import { get, set, del, keys as idbKeys } from 'idb-keyval';
+import throttle from 'lodash.throttle';
 
-interface QueuedMutation {
-  id: string; // Unique ID for the mutation
+interface OfflineMutation {
+  id: string;
   operationName: string;
-  variables: any;
+  variables: Record<string, unknown>; // Changed any to unknown
+  queuedAt: string;
+  attempts: number;
+  lastError?: string;
   priority?: number;
-  timestamp: number;
+  dependsOn?: string;
 }
 
-type EventListener = (event?: any) => void;
+// Placeholder for gql tag function (e.g., from @apollo/client)
+const gql = (strings: TemplateStringsArray) => strings.join('');
 
 export class OfflineMutationManager {
-  private static instance: OfflineMutationManager;
-  private queue: QueuedMutation[] = [];
-  private lastSync: Date | null = null;
-  private eventListeners: Record<string, EventListener[]> = {};
+  private static instance: OfflineMutationManager; // Singleton instance
+  public persister;
+  private maxRetries = 5;
+  private baseDelay = 1000;
+  private maxStorage = 5 * 1024 * 1024; // 5MB
 
-  // Private constructor for singleton pattern
   private constructor() {
-    console.log("OfflineMutationManager initialized");
-    // Load queue from storage if available (e.g., IndexedDB)
-    this.loadQueueFromStorage();
+    // Private constructor to enforce singleton pattern
+    const storage = {
+      getItem: async (key: string) => get(key),
+      setItem: async (key: string, value: unknown) => set(key, value), // Changed any to unknown
+      removeItem: async (key: string) => del(key),
+    };
+    this.persister = createAsyncStoragePersister({ storage });
   }
 
   public static getInstance(): OfflineMutationManager {
@@ -30,107 +40,148 @@ export class OfflineMutationManager {
     return OfflineMutationManager.instance;
   }
 
-  private async loadQueueFromStorage() {
-    // Placeholder: In a real app, load from IndexedDB or localStorage
-    console.log("OfflineMutationManager: Attempting to load queue from storage (mock).");
-    if (typeof window !== 'undefined') {
-      const storedQueue = localStorage.getItem('offlineMutationQueue');
-      if (storedQueue) {
-        this.queue = JSON.parse(storedQueue);
-        this.emitEvent('queueUpdated');
-      }
+  async queueMutation(mutation: Omit<OfflineMutation, 'id' | 'queuedAt' | 'attempts'>, priority: number = 1): Promise<void> {
+    const id = crypto.randomUUID();
+    const size = JSON.stringify(mutation).length;
+    if ((await this.getTotalSize()) + size > this.maxStorage) {
+      await this.evictOldest();
     }
-  }
-
-  private async saveQueueToStorage() {
-    // Placeholder: In a real app, save to IndexedDB or localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('offlineMutationQueue', JSON.stringify(this.queue));
-    }
-  }
-
-  public async queueMutation(
-    mutation: { operationName: string; variables: any },
-    priority: number = 2 // Default priority
-  ): Promise<{ success: boolean; id: string }> {
-    const newMutation: QueuedMutation = {
-      id: `mut-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+    await set(`mutation_${id}`, {
       ...mutation,
+      id,
+      queuedAt: new Date().toISOString(),
+      attempts: 0,
       priority,
-      timestamp: Date.now(),
-    };
-    this.queue.push(newMutation);
-    this.queue.sort((a, b) => (a.priority || 2) - (b.priority || 2) || a.timestamp - b.timestamp); // Sort by priority, then by time
-    await this.saveQueueToStorage();
-    this.emitEvent('queueUpdated');
-    console.log(`OfflineMutationManager: Queued mutation "${newMutation.operationName}" (ID: ${newMutation.id}). Queue size: ${this.queue.length}`);
-    
-    // Attempt to process immediately if online
-    if (typeof navigator !== 'undefined' && navigator.onLine) {
-      this.processQueue();
-    }
-    return { success: true, id: newMutation.id };
+    });
   }
 
-  public getQueueCount(): number {
-    return this.queue.length;
+  private throttledProcessQueue = throttle(this.processQueueInternal.bind(this), 100, { leading: true });
+
+  async processQueue(client: { mutate: (args: { mutation: string; variables: Record<string, unknown> }) => Promise<unknown> }): Promise<void> { // Added more specific type for client
+    this.throttledProcessQueue(client);
   }
 
-  public getLastSync(): Date | null {
-    return this.lastSync;
-  }
-
-  public async processQueue(): Promise<void> {
-    if (this.queue.length === 0 || (typeof navigator !== 'undefined' && !navigator.onLine)) {
-      if (this.queue.length > 0) console.log("OfflineMutationManager: Offline, cannot process queue.");
-      return;
+  private async processQueueInternal(client: { mutate: (args: { mutation: string; variables: Record<string, unknown> }) => Promise<unknown> }): Promise<void> { // Added more specific type for client
+    const allKeys = await idbKeys(); // Use idb-keyval's keys() method
+    const mutationKeys = allKeys.filter((k: IDBValidKey) => typeof k === 'string' && k.startsWith('mutation_')) as string[];
+    const mutations = await Promise.all(
+      mutationKeys.map((k: string) => get<OfflineMutation>(k))
+    );
+    const sortedMutations = this.sortWithDependencies(mutations.filter(Boolean) as OfflineMutation[]); // Filter out null/undefined results from get
+    const batches = [];
+    for (let i = 0; i < sortedMutations.length; i += 5) {
+      batches.push(sortedMutations.slice(i, i + 5));
     }
 
-    console.log(`OfflineMutationManager: Processing queue of ${this.queue.length} mutations.`);
-    const mutationToProcess = this.queue[0]; // Process one by one (FIFO based on current sort)
-
-    try {
-      // Placeholder for actual mutation execution (e.g., using fetch or a GraphQL client)
-      console.log(`OfflineMutationManager: Executing mutation "${mutationToProcess.operationName}" (ID: ${mutationToProcess.id})`, mutationToProcess.variables);
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); 
-      // const response = await executeGraphQLMutation(mutationToProcess.operationName, mutationToProcess.variables);
-      // if (!response.ok) throw new Error(`Mutation failed: ${response.statusText}`);
-      
-      console.log(`OfflineMutationManager: Mutation "${mutationToProcess.operationName}" (ID: ${mutationToProcess.id}) successful.`);
-      this.queue.shift(); // Remove from queue on success
-      this.lastSync = new Date();
-      await this.saveQueueToStorage();
-      this.emitEvent('queueUpdated');
-      this.emitEvent('syncCompleted', { success: true, mutationId: mutationToProcess.id });
-
-      // Process next item if any
-      if (this.queue.length > 0) {
-        this.processQueue(); // Recursive call for next item
+    for (const batch of batches) {
+      try {
+        const results = await Promise.all(
+          batch.map(async (mutation) => {
+            if (mutation.attempts >= this.maxRetries) {
+              await del(`mutation_${mutation.id}`);
+              return null;
+            }
+            const existing = mutationKeys.find((k: string) => k !== `mutation_${mutation.id}` && this.isDuplicate(k, mutation));
+            if (existing) {
+              await del(`mutation_${mutation.id}`);
+              return null;
+            }
+            return client.mutate({
+              mutation: gql`mutation ${mutation.operationName} { placeholderField }`, // Added placeholderField
+              variables: mutation.variables,
+            });
+          })
+        );
+        for (const [index, result] of results.entries()) {
+          if (result) await del(`mutation_${batch[index].id}`);
+        }
+      } catch (error: unknown) { // Changed any to unknown
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+        for (const mutation of batch) {
+          await set(`mutation_${mutation.id}`, {
+            ...mutation,
+            attempts: mutation.attempts + 1,
+            lastError: errorMessage,
+          });
+        }
+        const delay = this.baseDelay * Math.pow(2, batch[0].attempts);
+        setTimeout(() => this.processQueue(client), delay);
       }
-    } catch (error) {
-      console.error(`OfflineMutationManager: Failed to process mutation "${mutationToProcess.operationName}" (ID: ${mutationToProcess.id}):`, error);
-      // Handle error: e.g., move to a failed queue, retry logic, notify user
-      this.emitEvent('syncCompleted', { success: false, mutationId: mutationToProcess.id, error });
-      // For simplicity, we don't remove it here, so it might be retried next time processQueue is called.
-      // Or implement a retry limit / backoff strategy.
     }
   }
 
-  public addEventListener(eventName: string, listener: EventListener): void {
-    if (!this.eventListeners[eventName]) {
-      this.eventListeners[eventName] = [];
+  private async isDuplicate(key: string, mutation: OfflineMutation): Promise<boolean> {
+    const other = await get<OfflineMutation>(key);
+    return (
+      other?.operationName === mutation.operationName &&
+      JSON.stringify(other?.variables) === JSON.stringify(mutation.variables)
+    );
+  }
+
+  private async getTotalSize(): Promise<number> {
+    let size = 0;
+    const allKeys = await idbKeys();
+    for (const key of allKeys) {
+      if (typeof key === 'string' && key.startsWith('mutation_')) {
+        const mutation = await get<OfflineMutation>(key); // Added OfflineMutation type
+        if (mutation) { // Ensure mutation is not null/undefined
+          size += JSON.stringify(mutation).length;
+        }
+      }
     }
-    this.eventListeners[eventName].push(listener);
+    return size;
   }
 
-  public removeEventListener(eventName: string, listener: EventListener): void {
-    if (!this.eventListeners[eventName]) return;
-    this.eventListeners[eventName] = this.eventListeners[eventName].filter(l => l !== listener);
+  private async evictOldest(): Promise<void> {
+    const allKeys = await idbKeys();
+    const mutationKeys = allKeys.filter((k: IDBValidKey) => typeof k === 'string' && k.startsWith('mutation_')) as string[];
+    const mutationsWithKeys = await Promise.all(
+      mutationKeys.map(async (key: string) => ({ key, mutation: await get<OfflineMutation>(key) }))
+    );
+
+    const validMutations = mutationsWithKeys.filter((item): item is { key: string; mutation: OfflineMutation } => item.mutation !== undefined && item.mutation !== null);
+
+
+    if (validMutations.length === 0) return;
+
+    const oldestEntry = validMutations.sort((a, b) => { // Removed explicit types for a and b as they are inferred
+      const aTime = new Date(a.mutation.queuedAt).getTime();
+      const bTime = new Date(b.mutation.queuedAt).getTime();
+      return aTime - bTime;
+    })[0];
+
+    await del(oldestEntry.key);
   }
 
-  private emitEvent(eventName: string, data?: any): void {
-    if (!this.eventListeners[eventName]) return;
-    this.eventListeners[eventName].forEach(listener => listener(data));
+  private sortWithDependencies(mutations: OfflineMutation[]): OfflineMutation[] {
+    const graph = new Map<string, OfflineMutation[]>();
+    const inDegree = new Map<string, number>();
+
+    mutations.forEach((m) => {
+      graph.set(m.id, []);
+      inDegree.set(m.id, 0);
+    });
+
+    mutations.forEach((m) => {
+      if (m.dependsOn) {
+        graph.get(m.dependsOn)?.push(m);
+        inDegree.set(m.id, (inDegree.get(m.id) || 0) + 1);
+      }
+    });
+
+    const queue: string[] = mutations.filter((m) => !inDegree.get(m.id)).map((m) => m.id);
+    const result: OfflineMutation[] = [];
+
+    while (queue.length) {
+      const id = queue.shift()!;
+      const mutation = mutations.find((m) => m.id === id)!;
+      result.push(mutation);
+      graph.get(id)?.forEach((dep) => {
+        inDegree.set(dep.id, inDegree.get(dep.id)! - 1);
+        if (inDegree.get(dep.id) === 0) queue.push(dep.id);
+      });
+    }
+
+    return result;
   }
 }

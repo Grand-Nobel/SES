@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-runner-service
+  labels:
+    app: agent-runner
+spec:
+  type: ClusterIP # Runners are typically not exposed externally
+  selector:
+    app: agent-runner
+  ports:
+  - name: http # Optional: if runners expose a health check or metrics endpoint
+    protocol: TCP
+    port: 8080 # Port the service is exposed on within the cluster
+    targetPort: 8080 # Port the container is listening on (matches deployment.yaml)

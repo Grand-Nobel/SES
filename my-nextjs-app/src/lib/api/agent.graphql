@@ -1,0 +1,16 @@
+# src/lib/api/agent.graphql
+type AgentUIAction {
+  type: String!
+  target: String!
+  payload: JSON
+  metadata: AgentMetadata
+  proofOfAction: String!
+}
+
+type AgentMetadata {
+  agentName: String!
+  traceId: String!
+  urgency: String
+  jwt: String!
+  timestamp: String!
+}

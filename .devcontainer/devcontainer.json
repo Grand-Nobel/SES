@@ -1,0 +1,11 @@
+{
+  "name": "Codespace for SES",
+  "image": "mcr.microsoft.com/devcontainers/universal:latest",
+  "remoteUser": "codespace",
+  "containerUser": "codespace",
+  "containerEnv": {
+    "USER_UID": "1000",
+    "USER_GID": "1000"
+  },
+  "postCreateCommand": "if ! id -u codespace > /dev/null 2>&1; then sudo useradd -m -s /bin/bash -u 1000 -g 1000 codespace; fi && sudo chown -R codespace:codespace /home/codespace"
+}

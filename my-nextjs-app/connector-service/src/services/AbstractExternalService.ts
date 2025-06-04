@@ -9,6 +9,7 @@ export interface ExternalServiceRequestOptions {
   payload?: any;
   queryParams?: Record<string, any>;
   additionalHeaders?: Record<string, string>;
+  timeout?: number; // Optional request timeout in milliseconds
 }
 
 export abstract class AbstractExternalService {

@@ -4,7 +4,7 @@ import { PrivacyLogger } from '@/lib/logging';
 import { supabase } from '@/lib/supabase';
 import { agentRunner } from '@/lib/agents';
 import { useAuthStore } from '@/stores/authStore';
-import './AiSuggestedActions.module.css';
+import styles from './AiSuggestedActions.module.css';
 
 interface SuggestedAction {
   id: string;

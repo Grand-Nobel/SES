@@ -1,16 +1,14 @@
-'use client';
+'use client'; // Required for components using client-side hooks or context
 
 import { SessionProvider } from 'next-auth/react';
-import type { ReactNode } from 'react';
+import React from 'react';
 
 interface AuthProviderProps {
-  children: ReactNode;
-  // session?: any; // The session prop is optional for SessionProvider in App Router
+  children: React.ReactNode;
 }
 
-export default function AuthProvider({ children }: AuthProviderProps) {
-  // The SessionProvider can optionally take a `session` prop if you're passing
-  // a session fetched server-side, but for client-side session management via
-  // useSession, just wrapping children is often enough.
+const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   return <SessionProvider>{children}</SessionProvider>;
-}
+};
+
+export default AuthProvider;

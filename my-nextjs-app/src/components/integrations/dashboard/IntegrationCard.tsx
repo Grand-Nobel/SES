@@ -62,9 +62,10 @@ export default function IntegrationCard({ integration, tenantId }: IntegrationCa
       alert('Integration deleted (mock). In a real app, this card would be removed or UI updated.');
       // onDelete?.(integration.id); // Trigger callback to update parent list
       
-    } catch (err: any) {
-      logger.error({ integrationId: integration.id, tenantId, error: err.message }, 'Exception during delete integration.');
-      setError(err.message || 'An unexpected error occurred.');
+    } catch (err: unknown) { // Changed any to unknown
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
+      logger.error({ integrationId: integration.id, tenantId, error: errorMessage }, 'Exception during delete integration.');
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -96,9 +97,10 @@ export default function IntegrationCard({ integration, tenantId }: IntegrationCa
         logger.info({ integrationId: integration.id, tenantId }, 'Integration status updated successfully.');
         alert(`Status changed to ${newStatus} (mock). In a real app, UI would update.`);
         // Potentially update local state or re-fetch to reflect change
-    } catch (err: any) {
-        logger.error({ integrationId: integration.id, tenantId, error: err.message }, 'Exception during toggle active status.');
-        setError(err.message || 'An unexpected error occurred.');
+    } catch (err: unknown) { // Changed any to unknown
+        const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred.';
+        logger.error({ integrationId: integration.id, tenantId, error: errorMessage }, 'Exception during toggle active status.');
+        setError(errorMessage);
     } finally {
         setIsLoading(false);
     }

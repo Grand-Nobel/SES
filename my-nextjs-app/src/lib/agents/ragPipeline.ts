@@ -2,16 +2,7 @@
 import weaviate, { WeaviateClient, ConnectionParams, ApiKey } from 'weaviate-ts-client';
 import { supabase } from '@/lib/supabase';
 import { redis } from '@/lib/redis';
-import { openDB, IDBPDatabase } from 'idb';
 import { PrivacyLogger } from '@/lib/logging';
-
-// Define a type for the RAG cache database schema
-interface RagCacheDb extends IDBPDatabase {
-  queries: {
-    key: string;
-    value: { query: string; results: string[] };
-  };
-}
 
 // Placeholder for the client, will be initialized asynchronously
 let weaviateClientInstance: WeaviateClient | null = null;
@@ -98,14 +89,6 @@ async function getWeaviateClient(): Promise<WeaviateClient> {
 }
 
 
-const dbPromise = openDB<RagCacheDb>('ses-rag-cache', 1, {
-  upgrade(db) {
-    if (!db.objectStoreNames.contains('queries')) {
-      db.createObjectStore('queries', { keyPath: 'query' });
-    }
-  },
-});
-
 export async function indexTenantData(tenantId: string, data: { id: string; content: string }[]): Promise<void> {
   const className = `Tenant_${tenantId.replace(/-/g, '_')}`;
   // Example sharding by region - adjust based on your tenantId format or sharding strategy
@@ -115,13 +98,12 @@ export async function indexTenantData(tenantId: string, data: { id: string; cont
   // Ensure class exists - this might need to be more robust in a production system
   try {
     await client.schema.classGetter().withClassName(className).do();
-  } catch (e) { // Assuming error means class doesn't exist
+  } catch (_e) { // Assuming error means class doesn't exist, _e is unused
     console.log(`Class ${className} does not exist, creating...`);
     await client.schema.classCreator().withClass({
       class: className,
       vectorizer: 'text2vec-transformers', // Ensure this vectorizer is available in your Weaviate
-      // @ts-ignore // shardingConfig might not be in the version of weaviate-ts-client types
-      shardingConfig: { desiredCount: 3, region }, 
+      shardingConfig: { desiredCount: 3, region } as any, // Using 'as any' if shardingConfig is not in types
     }).do();
   }
   
@@ -183,7 +165,7 @@ export async function queryRAG(tenantId: string, query: string): Promise<string[
 
   interface WeaviateFullGraphQLResponse {
     data?: WeaviateGraphQLData;
-    errors?: any[]; // Define a more specific error type if needed
+    errors?: unknown[]; // Define a more specific error type if needed, using unknown instead of any
   }
 
   try {
