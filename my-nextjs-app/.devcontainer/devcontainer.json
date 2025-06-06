@@ -1,0 +1,8 @@
+{
+  "name": "My Next.js App",
+  "image": "mcr.microsoft.com/devcontainers/universal:latest",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "postCreateCommand": "mkdir -p /home/codespace/.config/vscode-dev-containers && chown -R codespace:codespace /home/codespace"
+}

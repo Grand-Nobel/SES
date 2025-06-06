@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["public"]
 }
 
 model Tenant {
@@ -32,6 +34,7 @@ model Tenant {
 
   @@index([name])
   @@map("tenants")
+  @@schema("public")
 }
 
 model User {
@@ -55,6 +58,7 @@ model User {
   @@index([tenantId])
   @@index([email])
   @@map("users")
+  @@schema("public")
 }
 
 model Account {
@@ -75,6 +79,7 @@ model Account {
   @@unique([provider, providerAccountId])
   @@index([userId])
   @@map("accounts")
+  @@schema("public")
 }
 
 model Session {
@@ -88,6 +93,7 @@ model Session {
 
   @@index([userId])
   @@map("sessions")
+  @@schema("public")
 }
 
 model VerificationToken {
@@ -97,6 +103,7 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+  @@schema("public")
 }
 
 model Client {
@@ -111,6 +118,7 @@ model Client {
 
   @@index([tenantId])
   @@map("clients")
+  @@schema("public")
 }
 
 model Integration {
@@ -125,6 +133,7 @@ model Integration {
 
   @@index([category])
   @@map("integrations")
+  @@schema("public")
 }
 
 model UserIntegration {
@@ -141,6 +150,7 @@ model UserIntegration {
   @@index([tenantId])
   @@index([integrationId])
   @@map("user_integrations")
+  @@schema("public")
 }
 
 model OntologyMetadata {
@@ -159,6 +169,7 @@ model OntologyMetadata {
   @@index([entityType])
   @@index([schemaDefinition])
   @@map("ontology_metadata")
+  @@schema("public")
 }
 
 model DashboardConfig {
@@ -177,6 +188,7 @@ model DashboardConfig {
   @@index([userId])
   @@index([layout])
   @@map("dashboard_configs")
+  @@schema("public")
 }
 
 model IntegrationEvent {
@@ -193,6 +205,7 @@ model IntegrationEvent {
   @@index([timestamp])
   @@index([normalizedPayload])
   @@map("integration_events")
+  @@schema("public")
 }
 
 model EtlConfig {
@@ -209,6 +222,7 @@ model EtlConfig {
   @@index([sourceService])
   @@index([transformationRules])
   @@map("etl_configs")
+  @@schema("public")
 }
 
 model KpiPrediction {
@@ -225,6 +239,7 @@ model KpiPrediction {
   @@index([timestamp])
   @@index([prediction])
   @@map("kpi_predictions")
+  @@schema("public")
 }
 
 model TemplateLibrary {
@@ -242,6 +257,7 @@ model TemplateLibrary {
   @@index([templateType])
   @@index([metadata])
   @@map("template_library")
+  @@schema("public")
 }
 
 model Invoice {
@@ -259,6 +275,7 @@ model Invoice {
   @@index([tenantId])
   @@index([clientId])
   @@map("invoices")
+  @@schema("public")
 }
 
 model Ledger {
@@ -273,6 +290,7 @@ model Ledger {
   @@index([tenantId])
   @@index([timestamp])
   @@map("ledgers")
+  @@schema("public")
 }
 
 model Subscription {
@@ -290,6 +308,7 @@ model Subscription {
   @@index([tenantId])
   @@index([clientId])
   @@map("subscriptions")
+  @@schema("public")
 }
 
 model Payroll {
@@ -307,6 +326,7 @@ model Payroll {
   @@index([userId])
   @@index([payDate])
   @@map("payroll")
+  @@schema("public")
 }
 
 model AuditLog {
@@ -322,6 +342,7 @@ model AuditLog {
   @@index([tenantId])
   @@index([timestamp])
   @@map("audit_logs")
+  @@schema("public")
 }
 
 enum InvoiceStatus {
@@ -329,10 +350,14 @@ enum InvoiceStatus {
   Sent
   Paid
   Overdue
+
+  @@schema("public")
 }
 
 enum SubscriptionStatus {
   Active
   Cancelled
   Expired
+
+  @@schema("public")
 }

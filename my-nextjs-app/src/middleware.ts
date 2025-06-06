@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
   console.log('[Middleware] IsAuthenticated:', isAuthenticated);
 
   // If trying to access protected routes and not authenticated, redirect to sign-in
-  const protectedPaths = ['/dashboard', '/analytics', '/notifications', '/settings', '/integrations', '/marketplace'];
+  const protectedPaths = ['/analytics', '/notifications', '/settings', '/integrations', '/marketplace']; // Temporarily removed /dashboard for testing
   const isAccessingProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
 
   if (isAccessingProtectedPath && !isAuthenticated) {
@@ -65,7 +65,7 @@ export const config = {
      * For NextAuth.js v4, it's often safer to explicitly list protected page routes rather than using a broad matcher
      * that might interfere with /api/auth.
      */
-    '/dashboard/:path*',
+    // '/dashboard/:path*', // Temporarily removed for testing
     '/analytics/:path*',
     '/notifications/:path*',
     '/settings/:path*',

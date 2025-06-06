@@ -1,14 +1,16 @@
 // pages/api/auth/[...nextauth]/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import NextAuth, { NextAuthOptions, User } from 'next-auth';
+import NextAuth, { NextAuthOptions, User, Account, Session, Profile } from 'next-auth'; // Added Profile
+import { JWT } from 'next-auth/jwt';
+import { AdapterUser } from 'next-auth/adapters'; // Import AdapterUser
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import logger from '@/lib/logging';
 import { PrismaClient } from '@prisma/client';
-import { PrismaAdapter } from '@next-auth/prisma-adapter'; // Added for Prisma adapter
+import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { compare } from 'bcrypt';
 import { RateLimiterMemory } from 'rate-limiter-flexible';
 import { createHash } from 'crypto';
+// Removed NextApiRequest and RequestInternal imports as they are causing issues
 
 // Singleton PrismaClient to prevent "too many connections" in dev
 const prisma = (globalThis as any).prisma || new PrismaClient();
@@ -43,7 +45,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email", placeholder: "user@example.com" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials: Record<"email" | "password", string> | undefined, req: any) { // Reverted req to any
         try {
           // Rate limiting
           const forwardedFor = req.headers?.['x-forwarded-for'];
@@ -63,6 +65,9 @@ export const authOptions: NextAuthOptions = {
 
           const user = await prisma.user.findUnique({
             where: { email: credentials.email },
+            include: {
+              profile: true, // Include the profile relation
+            },
           });
 
           if (!user || !user.password) {
@@ -70,7 +75,10 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
+          logger.debug({ email: credentials.email, stage: 'v4_authorize_password_compare_start', inputPasswordLength: credentials.password.length, storedPasswordHashLength: user.password.length }, 'Attempting password comparison.');
           const isValid = await compare(credentials.password, user.password);
+          logger.debug({ email: credentials.email, stage: 'v4_authorize_password_compare_end', isValid }, 'Password comparison result.');
+
           if (!isValid) {
             logger.warn({ email: credentials.email, stage: 'v4_authorize_failed' }, 'Invalid password.');
             return null;
@@ -122,7 +130,7 @@ export const authOptions: NextAuthOptions = {
     error: '/auth/error',
   },
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account }: { token: JWT; user: User | AdapterUser; account: Account | null }) {
       try {
         logger.info({ stage: 'v4_jwt_start', tokenId: token.sub, userId: user?.id, accountProvider: account?.provider }, 'JWT callback invoked.');
 
@@ -148,7 +156,7 @@ export const authOptions: NextAuthOptions = {
         return { ...token, error: "JWTProcessingError" };
       }
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       try {
         logger.info({ stage: 'v4_session_start', sessionUserId: session?.user?.id, tokenId: token.id }, 'Session callback invoked.');
 
@@ -172,7 +180,7 @@ export const authOptions: NextAuthOptions = {
         return { ...session, error: "SessionProcessingError" };
       }
     },
-    async redirect({ url, baseUrl }) {
+    async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
       try {
         logger.info({ currentFullUrl: url, baseUrlFromNextAuth: baseUrl, stage: 'v4_redirect_invoked' }, 'Redirect callback invoked.');
 
@@ -191,7 +199,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   events: {
-    async signIn({ user, account, isNewUser }) {
+    async signIn({ user, account, profile, isNewUser }: { user: User; account: Account | null; profile?: Profile | undefined; isNewUser?: boolean | undefined }) { // Added profile and made isNewUser optional
       try {
         const anonymizedUserId = createHash('sha256').update(user.id).digest('hex');
         logger.info(
@@ -202,7 +210,7 @@ export const authOptions: NextAuthOptions = {
         logger.error({ error: error.message, stack: error.stack, stage: 'v4_event_signIn_error' }, 'Error in signIn event.');
       }
     },
-    async signOut({ session, token }) {
+    async signOut({ session, token }: { session: Session; token: JWT }) {
       try {
         const anonymizedUserId = token?.id ? createHash('sha256').update(token.id).digest('hex') : 'unknown';
         logger.info(
@@ -216,14 +224,14 @@ export const authOptions: NextAuthOptions = {
   },
   debug: process.env.NODE_ENV === 'development',
   logger: {
-    error(code, metadata) {
+    error(code: string, metadata: Error | Record<string, unknown> | undefined) {
       const errorDetails = metadata instanceof Error ? { name: metadata.name, message: metadata.message, stack: metadata.stack } : metadata;
       logger.error({ code, metadata: errorDetails, source: 'NextAuth_v4' }, `NextAuth v4 Error: ${code}`);
     },
-    warn(code: string, metadata?: any) {
+    warn(code: string, metadata?: Record<string, unknown>) {
       logger.warn({ code, metadata, source: 'NextAuth_v4' }, `NextAuth v4 Warning: ${code}`);
     },
-    debug(code, metadata) {
+    debug(code: string, metadata: unknown) { // Changed metadata type to unknown
       if (logger.level === 'debug' || process.env.NODE_ENV === 'development') {
         logger.debug({ code, metadata, source: 'NextAuth_v4' }, `NextAuth v4 Debug: ${code}`);
       }

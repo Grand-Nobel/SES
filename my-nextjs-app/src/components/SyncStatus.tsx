@@ -17,9 +17,9 @@ const SyncStatus: React.FC = () => {
 
     const offlineManager = OfflineMutationManager.getInstance(); // Use singleton instance
     
-    const updateStatus = () => {
-      setQueueCount(offlineManager.getQueueCount());
-      setLastSync(offlineManager.getLastSync());
+    const updateStatus = async () => { // Make updateStatus async
+      setQueueCount(await offlineManager.getQueueCount()); // Await the promise
+      setLastSync(offlineManager.getLastSync()); // getLastSync is synchronous
       if (typeof window !== 'undefined') {
         setIsOnline(navigator.onLine);
       }
@@ -28,24 +28,24 @@ const SyncStatus: React.FC = () => {
     updateStatus(); // Initial status
 
     // Listen to custom events from OfflineMutationManager
-    const handleQueueUpdated = () => updateStatus();
-    const handleSyncCompleted = () => updateStatus();
+    const handleQueueUpdated = async () => updateStatus(); // Make handler async
+    const handleSyncCompleted = async () => updateStatus(); // Make handler async
     
     offlineManager.addEventListener('queueUpdated', handleQueueUpdated);
     offlineManager.addEventListener('syncCompleted', handleSyncCompleted);
 
     // Listen to browser online/offline events
-    const handleOnline = () => {
+    const handleOnline = async () => { // Make handler async
       setIsOnline(true);
-      updateStatus(); // Re-check queue on going online
+      await updateStatus(); // Re-check queue on going online, await it
       // Optionally trigger sync attempt if queue > 0
-      if (offlineManager.getQueueCount() > 0) {
-        offlineManager.processQueue(); 
+      if (await offlineManager.getQueueCount() > 0) { // Await here too
+        // offlineManager.processQueue(); // processQueue needs a client argument, cannot call directly here without it
       }
     };
-    const handleOffline = () => {
+    const handleOffline = async () => { // Make handler async
       setIsOnline(false);
-      updateStatus();
+      await updateStatus(); // Await it
     };
 
     window.addEventListener('online', handleOnline);

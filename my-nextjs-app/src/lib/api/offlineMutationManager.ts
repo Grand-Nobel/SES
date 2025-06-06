@@ -5,7 +5,7 @@ import throttle from 'lodash.throttle';
 interface OfflineMutation {
   id: string;
   operationName: string;
-  variables: Record<string, unknown>; // Changed any to unknown
+  variables: Record<string, unknown>;
   queuedAt: string;
   attempts: number;
   lastError?: string;
@@ -16,21 +16,32 @@ interface OfflineMutation {
 // Placeholder for gql tag function (e.g., from @apollo/client)
 const gql = (strings: TemplateStringsArray) => strings.join('');
 
+type ProcessQueueClientType = { mutate: (args: { mutation: string; variables: Record<string, unknown> }) => Promise<unknown> };
+type ProcessQueueInternalType = (client: ProcessQueueClientType) => Promise<void>;
+
 export class OfflineMutationManager {
   private static instance: OfflineMutationManager; // Singleton instance
   public persister;
   private maxRetries = 5;
   private baseDelay = 1000;
   private maxStorage = 5 * 1024 * 1024; // 5MB
+  private listeners: Record<string, Array<(...args: any[]) => void>> = {};
+
+  private throttledProcessQueue: ProcessQueueInternalType;
 
   private constructor() {
     // Private constructor to enforce singleton pattern
     const storage = {
       getItem: async (key: string) => get(key),
-      setItem: async (key: string, value: unknown) => set(key, value), // Changed any to unknown
+      setItem: async (key: string, value: unknown) => set(key, value),
       removeItem: async (key: string) => del(key),
     };
     this.persister = createAsyncStoragePersister({ storage });
+    this.throttledProcessQueue = throttle<ProcessQueueInternalType>(
+      this.processQueueInternal,
+      100,
+      { leading: true }
+    );
   }
 
   public static getInstance(): OfflineMutationManager {
@@ -38,6 +49,37 @@ export class OfflineMutationManager {
       OfflineMutationManager.instance = new OfflineMutationManager();
     }
     return OfflineMutationManager.instance;
+  }
+
+  public addEventListener(eventName: string, callback: (...args: any[]) => void): void {
+    if (!this.listeners[eventName]) {
+      this.listeners[eventName] = [];
+    }
+    this.listeners[eventName].push(callback);
+  }
+
+  public removeEventListener(eventName: string, callback: (...args: any[]) => void): void {
+    if (this.listeners[eventName]) {
+      this.listeners[eventName] = this.listeners[eventName].filter(cb => cb !== callback);
+    }
+  }
+
+  private dispatchEvent(eventName: string, ...args: any[]): void {
+    if (this.listeners[eventName]) {
+      this.listeners[eventName].forEach(callback => callback(...args));
+    }
+  }
+
+  public async getQueueCount(): Promise<number> {
+    const allKeys = await idbKeys();
+    const mutationKeys = allKeys.filter((k: IDBValidKey) => typeof k === 'string' && k.startsWith('mutation_'));
+    return mutationKeys.length;
+  }
+
+  public getLastSync(): Date | null {
+    // This would require storing the last sync time, which is not currently implemented.
+    // For now, return null or a placeholder.
+    return null;
   }
 
   async queueMutation(mutation: Omit<OfflineMutation, 'id' | 'queuedAt' | 'attempts'>, priority: number = 1): Promise<void> {
@@ -53,21 +95,20 @@ export class OfflineMutationManager {
       attempts: 0,
       priority,
     });
+    this.dispatchEvent('queueUpdated');
   }
 
-  private throttledProcessQueue = throttle(this.processQueueInternal.bind(this), 100, { leading: true });
-
-  async processQueue(client: { mutate: (args: { mutation: string; variables: Record<string, unknown> }) => Promise<unknown> }): Promise<void> { // Added more specific type for client
+  async processQueue(client: { mutate: (args: { mutation: string; variables: Record<string, unknown> }) => Promise<unknown> }): Promise<void> {
     this.throttledProcessQueue(client);
   }
 
-  private async processQueueInternal(client: { mutate: (args: { mutation: string; variables: Record<string, unknown> }) => Promise<unknown> }): Promise<void> { // Added more specific type for client
-    const allKeys = await idbKeys(); // Use idb-keyval's keys() method
+  private processQueueInternal = async (client: { mutate: (args: { mutation: string; variables: Record<string, unknown> }) => Promise<unknown> }): Promise<void> => {
+    const allKeys = await idbKeys();
     const mutationKeys = allKeys.filter((k: IDBValidKey) => typeof k === 'string' && k.startsWith('mutation_')) as string[];
     const mutations = await Promise.all(
       mutationKeys.map((k: string) => get<OfflineMutation>(k))
     );
-    const sortedMutations = this.sortWithDependencies(mutations.filter(Boolean) as OfflineMutation[]); // Filter out null/undefined results from get
+    const sortedMutations = this.sortWithDependencies(mutations.filter(Boolean) as OfflineMutation[]);
     const batches = [];
     for (let i = 0; i < sortedMutations.length; i += 5) {
       batches.push(sortedMutations.slice(i, i + 5));
@@ -87,7 +128,7 @@ export class OfflineMutationManager {
               return null;
             }
             return client.mutate({
-              mutation: gql`mutation ${mutation.operationName} { placeholderField }`, // Added placeholderField
+              mutation: gql`mutation ${mutation.operationName} { placeholderField }`,
               variables: mutation.variables,
             });
           })
@@ -95,7 +136,8 @@ export class OfflineMutationManager {
         for (const [index, result] of results.entries()) {
           if (result) await del(`mutation_${batch[index].id}`);
         }
-      } catch (error: unknown) { // Changed any to unknown
+        this.dispatchEvent('queueUpdated');
+      } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
         for (const mutation of batch) {
           await set(`mutation_${mutation.id}`, {
@@ -107,6 +149,11 @@ export class OfflineMutationManager {
         const delay = this.baseDelay * Math.pow(2, batch[0].attempts);
         setTimeout(() => this.processQueue(client), delay);
       }
+    }
+    // After all batches are attempted, check if queue is empty for syncCompleted
+    const finalQueueCount = await this.getQueueCount();
+    if (finalQueueCount === 0) {
+      this.dispatchEvent('syncCompleted');
     }
   }
 
@@ -123,8 +170,8 @@ export class OfflineMutationManager {
     const allKeys = await idbKeys();
     for (const key of allKeys) {
       if (typeof key === 'string' && key.startsWith('mutation_')) {
-        const mutation = await get<OfflineMutation>(key); // Added OfflineMutation type
-        if (mutation) { // Ensure mutation is not null/undefined
+        const mutation = await get<OfflineMutation>(key);
+        if (mutation) {
           size += JSON.stringify(mutation).length;
         }
       }
@@ -141,10 +188,9 @@ export class OfflineMutationManager {
 
     const validMutations = mutationsWithKeys.filter((item): item is { key: string; mutation: OfflineMutation } => item.mutation !== undefined && item.mutation !== null);
 
-
     if (validMutations.length === 0) return;
 
-    const oldestEntry = validMutations.sort((a, b) => { // Removed explicit types for a and b as they are inferred
+    const oldestEntry = validMutations.sort((a, b) => {
       const aTime = new Date(a.mutation.queuedAt).getTime();
       const bTime = new Date(b.mutation.queuedAt).getTime();
       return aTime - bTime;

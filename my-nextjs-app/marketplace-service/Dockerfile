@@ -7,28 +7,28 @@ WORKDIR /usr/src/app
 RUN npm install -g pnpm
 
 # Copy root package.json and pnpm-lock.yaml to leverage Docker cache for dependencies
-# Adjust path if your pnpm-workspace.yaml is at a different location or not used
-COPY ../package.json ./
-COPY ../pnpm-lock.yaml ./
-# If you have a pnpm-workspace.yaml at the root of my-nextjs-app, copy it too
-# COPY ../pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# Copy marketplace-service specific package.json
-COPY ./package.json ./marketplace-service/package.json
+# Copy all package.json files for all workspaces
+COPY connector-service/package.json ./connector-service/
+COPY marketplace-service/package.json ./marketplace-service/
+COPY packages/connector-cli/package.json ./packages/connector-cli/
+COPY packages/connector-sdk/package.json ./packages/connector-sdk/
 
-# Install dependencies for the marketplace-service only
-# This assumes marketplace-service is a workspace defined in the root pnpm-workspace.yaml or package.json
-RUN pnpm install --filter marketplace-service --prod --frozen-lockfile
+# Install all dependencies for the entire workspace
+RUN pnpm install
 
-# Copy the rest of the marketplace-service source code
-COPY . ./marketplace-service/
+# Copy the rest of the source code for marketplace-service
+COPY marketplace-service ./marketplace-service/
 
 # Copy shared tsconfig if applicable, or rely on the service's own tsconfig
 # COPY ../tsconfig.base.json ./
 
 # Build the marketplace-service
 # Ensure your tsconfig.json paths are correct for the build context
-RUN pnpm --filter marketplace-service exec tsc --build ./marketplace-service/tsconfig.json
+WORKDIR /usr/src/app/marketplace-service
+ENV PATH="/usr/src/app/node_modules/.bin:$PATH"
+RUN tsc --build tsconfig.json
 
 # Stage 2: Production image
 FROM node:18-alpine
