@@ -1,0 +1,32 @@
+# Placeholder for orchestrator-rollout.yaml
+# This file is referenced by Terraform in main.tf.
+# It should contain a valid Kubernetes manifest, likely an Argo Rollout definition.
+# Example minimal Argo Rollout (replace with actual definition):
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: orchestrator-rollout-placeholder
+  labels:
+    app.kubernetes.io/name: orchestrator
+    app.kubernetes.io/instance: ses-orchestration
+    app.kubernetes.io/component: application
+spec:
+  replicas: {{ .Values.orchestrator.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: orchestrator-placeholder # Should match template spec
+  template:
+    metadata:
+      labels:
+        app: orchestrator-placeholder # Should match selector
+    spec:
+      containers:
+      - name: orchestrator
+        image: "{{ .Values.orchestrator.image.repository }}:{{ .Values.orchestrator.image.tag }}"
+        ports:
+        - containerPort: 8080 # Example port
+  strategy:
+    canary:
+      steps:
+      - setWeight: 20
+      - pause: {}

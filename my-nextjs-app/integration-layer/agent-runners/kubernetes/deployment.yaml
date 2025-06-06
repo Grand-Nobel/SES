@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-runner
+  labels:
+    app: agent-runner
+spec:
+  replicas: 2 # Start with 2 replicas, HPA will manage
+  selector:
+    matchLabels:
+      app: agent-runner
+  template:
+    metadata:
+      labels:
+        app: agent-runner
+    spec:
+      containers:
+      - name: agent-runner
+        image: your-docker-registry/agent-runner-service:latest # Replace with your actual image
+        ports:
+        - containerPort: 8080 # Assuming the service inside listens on 8080, adjust if not
+        env:
+        - name: KAFKA_BROKERS
+          value: "kafka-service.kafka.svc.cluster.local:9092" # Example, adjust to your Kafka setup
+        - name: SUPABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: supabase-credentials
+              key: supabase_url
+        - name: SUPABASE_ANON_KEY
+          valueFrom:
+            secretKeyRef:
+              name: supabase-credentials
+              key: supabase_anon_key
+        # Add other necessary environment variables like LOG_LEVEL, OTEL_EXPORTER_OTLP_ENDPOINT etc.
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"

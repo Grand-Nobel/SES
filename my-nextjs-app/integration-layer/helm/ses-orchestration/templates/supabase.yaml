@@ -1,0 +1,20 @@
+# integration-layer/helm/ses-orchestration/templates/supabase.yaml
+{{- if .Values.supabase.externalName }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ses-orchestration.fullname" . }}-supabase
+  labels:
+    {{- include "ses-orchestration.labels" . | nindent 4 }}
+    app.kubernetes.io/component: supabase-external
+spec:
+  type: ExternalName
+  externalName: {{ .Values.supabase.externalName }}
+  {{- if .Values.supabase.port }}
+  ports:
+    - port: {{ .Values.supabase.port }}
+      targetPort: {{ .Values.supabase.port }} # For ExternalName, targetPort is often the same or informational
+      protocol: TCP
+      name: https # Assuming https, adjust if needed
+  {{- end }}
+{{- end }}

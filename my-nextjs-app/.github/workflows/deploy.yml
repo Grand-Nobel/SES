@@ -1,0 +1,18 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker build -t myapp:${{ github.sha }} .
+      - run: aws ecr get-login-password | docker login --username AWS --password-stdin my-ecr
+      - run: docker push myapp:${{ github.sha }}
+      - uses: kubernetes/action@v1
+        with:
+          args: |
+            set image deployment/myapp myapp=myapp:${{ github.sha }} &&
+            kubectl rollout status deployment/myapp &&
+            kubectl rollout undo deployment/myapp --to-revision=1 || true

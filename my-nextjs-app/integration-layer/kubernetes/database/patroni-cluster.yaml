@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ses-pg-cluster
+  namespace: default # Or a dedicated database namespace
+  labels:
+    app: patroni
+spec:
+  replicas: 3
+  serviceName: "ses-pg-cluster"
+  selector:
+    matchLabels:
+      app: patroni
+  template:
+    metadata:
+      labels:
+        app: patroni
+    spec:
+      containers:
+      - name: patroni
+        image: registry.opensource.zalan.do/acid/patroni:2.1.1-pg14 # Example image
+        env:
+        - name: PATRONI_SCOPE
+          value: "ses-pg-cluster"
+        - name: PATRONI_RESTAPI_LISTEN
+          value: "0.0.0.0:8008"
+        - name: PATRONI_KUBERNETES_USE_ENDPOINTS
+          value: "true"
+        - name: PATRONI_KUBERNETES_LABELS
+          value: "app=patroni"
+        - name: PATRONI_KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: PATRONI_ETCD3_HOSTS
+          value: "etcd-cluster-0.etcd-cluster:2379,etcd-cluster-1.etcd-cluster:2379,etcd-cluster-2.etcd-cluster:2379" # Reference etcd cluster
+        - name: PATRONI_POSTGRESQL_LISTEN
+          value: "0.0.0.0:5432"
+        - name: PATRONI_POSTGRESQL_CONNECT_ADDRESS
+          value: "$(POD_NAME).ses-pg-cluster.$(NAMESPACE).svc.cluster.local:5432"
+        - name: PATRONI_POSTGRESQL_DATA_DIR
+          value: "/var/lib/postgresql/data"
+        - name: PATRONI_POSTGRESQL_PARAMETERS_WAL_LEVEL
+          value: "logical"
+        - name: PATRONI_POSTGRESQL_PARAMETERS_MAX_WAL_SENDERS
+          value: "10"
+        - name: PATRONI_POSTGRESQL_PARAMETERS_MAX_CONNECTIONS
+          value: "100"
+        - name: PATRONI_REPLICATION_SLOTS_ENABLE
+          value: "true"
+        - name: PATRONI_TTL
+          value: "30"
+        - name: PATRONI_LOOP_WAIT
+          value: "10"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        ports:
+        - containerPort: 5432
+          name: postgresql
+        - containerPort: 8008
+          name: patroni-rest
+        volumeMounts:
+        - name: pgdata
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          httpGet:
+            path: /liveness
+            port: 8008
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /readiness
+            port: 8008
+          initialDelaySeconds: 5
+          periodSeconds: 3
+      volumes:
+      - name: pgdata
+        persistentVolumeClaim:
+          claimName: pgdata-$(POD_NAME)
+  volumeClaimTemplates:
+  - metadata:
+      name: pgdata
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: standard # Or appropriate storage class
+      resources:
+        requests:
+          storage: 50Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ses-pg-cluster
+  namespace: default # Or a dedicated database namespace
+  labels:
+    app: patroni
+spec:
+  ports:
+  - port: 5432
+    name: postgresql
+  - port: 8008
+    name: patroni-rest
+  clusterIP: None
+  selector:
+    app: patroni

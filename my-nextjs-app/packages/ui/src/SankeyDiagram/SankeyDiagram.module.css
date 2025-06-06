@@ -1,0 +1,6 @@
+/* Styles for SankeyDiagram component */
+.reduced-motion svg {
+  /* Add styles to minimize or disable animations for reduced motion */
+  /* For example, disable transitions if any are applied via CSS */
+  transition: none !important; 
+}

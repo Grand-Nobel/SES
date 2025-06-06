@@ -1,0 +1,158 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+:root {
+  /* Colors */
+  --color-background: #121418;
+  --color-surface: #1E2228;
+  --color-onBackground: #E5E7EB;
+  --color-onSurface: #D1D5DB;
+  --color-primary: #00F0FF;
+  --color-primary-hover: #00DDE8;
+  --color-secondary: #A1A1AA;
+  --color-success: #34D399;
+  --color-error: #F87171;
+  --color-warning: #FBBF24;
+
+  /* Light Theme Overrides */
+  --color-background-light: #F9FAFB;
+  --color-surface-light: #FFFFFF;
+  --color-onBackground-light: #1F2937;
+  --color-onSurface-light: #4B5563;
+
+  /* Spacing */
+  --space-2: 8px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* Radii */
+  --radius-1: 4px;
+  --radius-2: 8px;
+  --radius-3: 12px;
+
+  /* Typography */
+  --font-size-h1: clamp(2rem, 5vw, 3.5rem);
+  --font-size-h2: clamp(1.5rem, 3vw, 2.25rem);
+  --font-size-h3: clamp(1.25rem, 2vw, 1.5rem);
+  --font-size-body: clamp(0.875rem, 1.5vw, 1rem);
+  --font-size-small: clamp(0.75rem, 1vw, 0.875rem);
+  --line-height-body: 1.5;
+}
+
+/* Light Theme */
+.light {
+  --color-background: var(--color-background-light);
+  --color-surface: var(--color-surface-light);
+  --color-onBackground: var(--color-onBackground-light);
+  --color-onSurface: var(--color-onSurface-light);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-onBackground);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1 {
+  font-size: var(--font-size-h1);
+  font-weight: 700;
+  margin-bottom: var(--space-6);
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+  font-weight: 600;
+  margin-bottom: var(--space-4);
+}
+
+h3 {
+  font-size: var(--font-size-h3);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+p, label {
+  font-size: var(--font-size-body);
+  margin-bottom: var(--space-2);
+}
+
+/* Accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-1);
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  :root {
+    --color-background: #000000;
+    --color-surface: #111111;
+    --color-onBackground: #FFFFFF;
+    --color-onSurface: #FFFFFF;
+    --color-primary: #00FFFF;
+  }
+}
+
+/* Buttons */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: rgba(0, 240, 255, 0.1);
+}
+
+/* Containers */
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+/* Shadows */
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Skeleton Loader */
+.skeleton-loader {
+  background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-surface-light) 50%, var(--color-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive Design */
+@media (min-width: 1024px) {
+  .container {
+    padding: var(--space-6);
+  }
+}

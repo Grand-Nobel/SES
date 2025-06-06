@@ -1,0 +1,40 @@
+/* public/styles/colors.css */
+:root {
+  --color-quantum-black: #050A15;
+  --color-cerebral-gray: #1E2A45;
+  --color-enlightened-white: #F8FAFF;
+  --color-synthesis-blue: #0057FF;
+  --color-cognition-purple: #6236FF;
+  --color-intelligence-green: #00B288;
+  --color-intuition-gold: #FFB100;
+  --color-human-pink: #FF3B77;
+  --color-background-primary: var(--color-enlightened-white);
+  --color-text-primary: var(--color-quantum-black);
+  --color-action-primary: var(--color-synthesis-blue);
+  --color-success: var(--color-intelligence-green);
+  --color-warning: var(--color-intuition-gold);
+  --color-error: #E41B17;
+  --color-info: var(--color-synthesis-blue);
+  --color-blue-10: #E6F0FF;
+  --color-blue-20: #CCE0FF;
+  --color-blue-30: #99C1FF;
+  --color-blue-40: #66A3FF;
+  --color-blue-50: #3384FF;
+  --color-blue-60: #0057FF;
+  --color-blue-70: #0046CC;
+  --color-blue-80: #003499;
+  --color-blue-90: #002366;
+  --color-blue-100: #001133;
+}
+
+[data-theme="dark"] {
+  --color-background-primary: var(--color-quantum-black);
+  --color-text-primary: var(--color-enlightened-white);
+}
+
+@media (forced-colors: active) {
+  :root {
+    --color-background-primary: Canvas;
+    --color-text-primary: CanvasText;
+  }
+}

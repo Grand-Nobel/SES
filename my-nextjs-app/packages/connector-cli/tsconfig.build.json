@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json", // Inherit base settings
+  "compilerOptions": {
+    "outDir": "./dist",       // Output directory for built files
+    "rootDir": "./src",       // Source directory for .ts files (bin scripts might be separate)
+    "declaration": true,      // Generate .d.ts files for any library-like parts
+    "declarationMap": true,   // Generate sourcemaps for .d.ts files
+    "sourceMap": true,        // Generate .js.map sourcemap files
+    "composite": false,       // Typically false for the final build config
+    "noEmitOnError": true,    // Do not emit outputs if any errors were reported
+    "skipLibCheck": true      // Skip type checking of all declaration files (*.d.ts).
+  },
+  "include": ["src/**/*.ts", "bin/**/*.ts"], // Include both src and bin if bin contains TS
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.spec.ts", "templates"]
+}

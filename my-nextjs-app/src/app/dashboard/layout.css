@@ -1,0 +1,63 @@
+/* app/dashboard/layout.css */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  /* Assuming Topbar has a fixed height, adjust if necessary */
+  /* padding-top: var(--topbar-height, 60px);  */
+}
+
+.dashboard-layout main { /* Target main within .dashboard-layout */
+  flex: 1;
+  padding: var(--space-4, 16px); /* Use CSS variables for spacing */
+  /* If Sidebar has a fixed width and is present */
+  /* margin-left: var(--sidebar-width, 250px); */
+  /* This depends on how Sidebar and Topbar are positioned (fixed, absolute, or part of flex flow) */
+}
+
+/* Basic skip link styling, can be enhanced */
+.skip-link {
+  position: absolute;
+  top: -60px; /* Hide off-screen */
+  left: 10px;
+  background: var(--color-synthesis-blue, #007bff); /* Use theme color */
+  color: var(--color-enlightened-white, #ffffff); /* Use theme color */
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  z-index: 10000; /* Ensure it's on top of other elements */
+  transition: top 0.3s ease-in-out;
+  border-radius: 0 0 var(--border-radius-medium, 6px) var(--border-radius-medium, 6px);
+}
+
+.skip-link:focus {
+  top: 0; /* Bring into view on focus */
+}
+
+/* Example: If using a typical Sidebar + Topbar structure */
+/* This assumes Topbar is fixed/sticky at the top and Sidebar is fixed/sticky on the left */
+/*
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-content-wrapper {
+  display: flex;
+  flex: 1;
+  padding-top: var(--topbar-height, 60px); // Offset for fixed Topbar
+}
+
+.main-content-area {
+  flex: 1;
+  padding: var(--space-4, 16px);
+  margin-left: var(--sidebar-width, 250px); // Offset for fixed Sidebar
+  overflow-y: auto; // Allow content scrolling
+}
+
+// If Sidebar is part of the flex flow and not fixed:
+// .dashboard-layout {
+//   display: flex;
+// }
+// .sidebar-container { ... width ... }
+// .content-container { flex: 1; display: flex; flex-direction: column; }
+// .topbar-container { ... height ... }
+// .actual-main-content { flex: 1; padding: var(--space-4); overflow-y: auto; }
+*/

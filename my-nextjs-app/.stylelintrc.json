@@ -1,0 +1,12 @@
+{
+  "extends": ["stylelint-config-tailwindcss"],
+  "rules": {
+    "property-no-unknown": [
+      true,
+      {
+        "ignoreProperties": ["color", "background-color", "font-size"],
+        "ignoreSelectors": [":where([class*='custom-'])"]
+      }
+    ]
+  }
+}

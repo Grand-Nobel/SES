@@ -1,0 +1,17 @@
+.ai-suggested-actions {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.ai-suggested-actions__action {
+  padding: var(--spacing-2);
+  background: var(--color-blue-10);
+  border-radius: var(--border-radius-medium);
+  opacity: 0;
+  /* transition: opacity var(--animation-duration-base); */ /* Assuming --animation-duration-base is defined elsewhere or not strictly needed for placeholder */
+  transition: opacity 300ms ease-in-out; /* Using a default value */
+}
+
+.ai-suggested-actions__action--visible {
+  opacity: 1;
+}

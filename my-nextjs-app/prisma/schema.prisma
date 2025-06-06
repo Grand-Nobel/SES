@@ -1,0 +1,363 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  schemas  = ["public"]
+}
+
+model Tenant {
+  id                String             @id @default(uuid())
+  name              String
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  industry          String?
+  size              Int?
+  used_technologies String[]
+  auditLogs         AuditLog[]
+  clients           Client[]
+  dashboardConfigs  DashboardConfig[]
+  etlConfigs        EtlConfig[]
+  integrationEvents IntegrationEvent[]
+  invoices          Invoice[]
+  kpiPredictions    KpiPrediction[]
+  ledgers           Ledger[]
+  ontologyMetadata  OntologyMetadata[]
+  payroll           Payroll[]
+  subscriptions     Subscription[]
+  templateLibrary   TemplateLibrary[]
+  userIntegrations  UserIntegration[]
+  users             User[]
+
+  @@index([name])
+  @@map("tenants")
+  @@schema("public")
+}
+
+model User {
+  id               String            @id @default(uuid())
+  tenantId         String            @map("tenant_id")
+  name             String?
+  email            String            @unique
+  password         String?
+  image            String?
+  emailVerified    DateTime?         @map("email_verified")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  accounts         Account[]
+  auditLogs        AuditLog[]
+  dashboardConfigs DashboardConfig[]
+  payroll          Payroll[]
+  sessions         Session[]
+  userIntegrations UserIntegration[]
+  tenant           Tenant            @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([email])
+  @@map("users")
+  @@schema("public")
+}
+
+model Account {
+  id                String  @id @default(uuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+  @@schema("public")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("sessions")
+  @@schema("public")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+  @@schema("public")
+}
+
+model Client {
+  id            String         @id @default(uuid())
+  tenantId      String         @map("tenant_id")
+  name          String
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  tenant        Tenant         @relation(fields: [tenantId], references: [id])
+  invoices      Invoice[]
+  subscriptions Subscription[]
+
+  @@index([tenantId])
+  @@map("clients")
+  @@schema("public")
+}
+
+model Integration {
+  id               String            @id @default(uuid())
+  name             String
+  description      String
+  category         String
+  icon             String
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  userIntegrations UserIntegration[]
+
+  @@index([category])
+  @@map("integrations")
+  @@schema("public")
+}
+
+model UserIntegration {
+  id            String      @id @default(uuid())
+  userId        String      @map("user_id")
+  tenantId      String      @map("tenant_id")
+  integrationId String      @map("integration_id")
+  installedAt   DateTime    @default(now()) @map("installed_at")
+  integration   Integration @relation(fields: [integrationId], references: [id])
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
+  user          User        @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([tenantId])
+  @@index([integrationId])
+  @@map("user_integrations")
+  @@schema("public")
+}
+
+model OntologyMetadata {
+  id                String   @id @default(uuid())
+  tenantId          String   @map("tenant_id")
+  entityType        String   @map("entity_type")
+  relationshipType  String   @map("relationship_type")
+  relatedEntityType String   @map("related_entity_type")
+  relatedEntityId   String?  @map("related_entity_id")
+  schemaDefinition  Json     @map("schema_definition")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([entityType])
+  @@index([schemaDefinition])
+  @@map("ontology_metadata")
+  @@schema("public")
+}
+
+model DashboardConfig {
+  id            String   @id @default(uuid())
+  tenantId      String   @map("tenant_id")
+  userId        String   @map("user_id")
+  layout        Json
+  widgetConfigs Json     @map("widget_configs")
+  isDefault     Boolean  @default(false) @map("is_default")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([layout])
+  @@map("dashboard_configs")
+  @@schema("public")
+}
+
+model IntegrationEvent {
+  id                BigInt   @id @default(autoincrement())
+  tenantId          String   @map("tenant_id")
+  eventType         String   @map("event_type")
+  rawPayload        Json     @map("raw_payload")
+  normalizedPayload Json     @map("normalized_payload")
+  sourceService     String   @map("source_service")
+  timestamp         DateTime @default(now())
+  tenant            Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([timestamp])
+  @@index([normalizedPayload])
+  @@map("integration_events")
+  @@schema("public")
+}
+
+model EtlConfig {
+  id                  String   @id @default(uuid())
+  tenantId            String   @map("tenant_id")
+  sourceService       String   @map("source_service")
+  transformationRules Json     @map("transformation_rules")
+  isActive            Boolean  @default(true) @map("is_active")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  tenant              Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([sourceService])
+  @@index([transformationRules])
+  @@map("etl_configs")
+  @@schema("public")
+}
+
+model KpiPrediction {
+  id         String   @id @default(uuid())
+  tenantId   String   @map("tenant_id")
+  modelName  String   @map("model_name")
+  entityType String   @map("entity_type")
+  entityId   String   @map("entity_id")
+  prediction Json
+  timestamp  DateTime @default(now())
+  tenant     Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([timestamp])
+  @@index([prediction])
+  @@map("kpi_predictions")
+  @@schema("public")
+}
+
+model TemplateLibrary {
+  id           String   @id @default(uuid())
+  tenantId     String   @map("tenant_id")
+  templateType String   @map("template_type")
+  templateName String   @map("template_name")
+  content      String
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  tenant       Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([templateType])
+  @@index([metadata])
+  @@map("template_library")
+  @@schema("public")
+}
+
+model Invoice {
+  id            String        @id @default(uuid())
+  tenantId      String        @map("tenant_id")
+  clientId      String?       @map("client_id")
+  invoiceNumber String        @map("invoice_number")
+  amount        Decimal       @db.Decimal(12, 2)
+  status        InvoiceStatus @default(Draft)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  client        Client?       @relation(fields: [clientId], references: [id])
+  tenant        Tenant        @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([clientId])
+  @@map("invoices")
+  @@schema("public")
+}
+
+model Ledger {
+  id              BigInt   @id @default(autoincrement())
+  tenantId        String   @map("tenant_id")
+  transactionType String   @map("transaction_type")
+  amount          Decimal  @db.Decimal(12, 2)
+  balance         Decimal  @db.Decimal(12, 2)
+  timestamp       DateTime @default(now())
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([timestamp])
+  @@map("ledgers")
+  @@schema("public")
+}
+
+model Subscription {
+  id          String             @id @default(uuid())
+  tenantId    String             @map("tenant_id")
+  clientId    String?            @map("client_id")
+  planId      String             @map("plan_id")
+  status      SubscriptionStatus @default(Active)
+  renewalDate DateTime?          @map("renewal_date")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+  client      Client?            @relation(fields: [clientId], references: [id])
+  tenant      Tenant             @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId])
+  @@index([clientId])
+  @@map("subscriptions")
+  @@schema("public")
+}
+
+model Payroll {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  userId    String?  @map("user_id")
+  amount    Decimal  @db.Decimal(12, 2)
+  payDate   DateTime @map("pay_date")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([userId])
+  @@index([payDate])
+  @@map("payroll")
+  @@schema("public")
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  tenantId  String   @map("tenant_id")
+  userId    String   @map("user_id")
+  action    String
+  payload   Json?
+  timestamp DateTime @default(now())
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([timestamp])
+  @@map("audit_logs")
+  @@schema("public")
+}
+
+enum InvoiceStatus {
+  Draft
+  Sent
+  Paid
+  Overdue
+
+  @@schema("public")
+}
+
+enum SubscriptionStatus {
+  Active
+  Cancelled
+  Expired
+
+  @@schema("public")
+}

@@ -1,0 +1,124 @@
+/* app/dashboard/page.scss */
+/* Using CSS variables defined in global styles or layout */
+
+.ses-dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensure it takes at least full viewport height */
+  background: var(--background-color, #ffffff); /* Fallback color */
+  font-family: var(--font-family-primary, sans-serif); /* Fallback font */
+  padding: var(--spacing-4, 16px);
+  color: var(--text-color, #000000); /* Fallback color */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition for contrast toggle */
+}
+
+.ses-dashboard:focus {
+  /* Accessibility: provide a focus indicator for the main region if it's focusable */
+  outline: 2px solid var(--color-focus-ring, var(--color-synthesis-blue, #007bff));
+  outline-offset: 2px;
+}
+
+/* RTL support adjustments */
+.ses-dashboard[dir="rtl"] .ses-header {
+  flex-direction: row-reverse; /* Reverse items in header for RTL */
+}
+
+.ses-dashboard[dir="rtl"] .ses-grid {
+  direction: rtl; /* Grid items flow right-to-left */
+}
+
+.ses-dashboard[dir="rtl"] .ses-kpis,
+.ses-dashboard[dir="rtl"] .ses-chat {
+  text-align: right; /* Align text to the right for RTL sections */
+}
+
+.ses-dashboard[dir="rtl"] .ses-error {
+  /* Adjust margins if needed for RTL error messages */
+  margin-right: var(--spacing-2, 8px);
+  margin-left: 0;
+}
+
+.ses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4, 16px);
+  padding-bottom: var(--spacing-3, 12px);
+  border-bottom: 1px solid var(--color-border-subtle, #eee); /* Subtle separator */
+}
+
+.ses-header h1 {
+  font-size: var(--text-h1, 2rem); /* Use fluid typography variable */
+  margin: 0;
+  color: var(--color-text-heading, var(--text-color)); /* Specific heading color or fallback */
+}
+
+.ses-header .button { /* Assuming a general .button class for styling */
+  margin-left: var(--spacing-2, 8px);
+}
+
+.ses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Slightly larger min for cards */
+  gap: var(--spacing-3, 12px);
+  margin-bottom: var(--spacing-4, 16px); /* Space below the KPI grid */
+}
+
+.ses-kpis .kpi-card { /* Style KpiCard specifically if needed */
+  background-color: var(--kpi-card-color, var(--color-background-card, #fff)); /* Card background */
+  /* Add box-shadow, border-radius etc. if KpiCard doesn't handle it internally */
+}
+
+.ses-chat {
+  flex: 1; /* Allow chat to take remaining space if layout is column-based */
+  /* Add specific styling for chat container if needed */
+  margin-bottom: var(--spacing-4, 16px);
+}
+
+.ses-error {
+  padding: var(--spacing-3, 12px);
+  background: var(--color-error-background, #ffebee); /* Error background color */
+  color: var(--color-error-text, #c62828); /* Error text color */
+  border: 1px solid var(--color-error-border, #ffcdd2); /* Error border color */
+  border-radius: var(--border-radius-medium, 6px);
+  margin-bottom: var(--spacing-2, 8px);
+  text-align: left; /* Default text align for error messages */
+}
+
+/* Styles for the theme customizer modal (if not handled by Modal component itself) */
+.theme-customizer {
+  margin-top: var(--spacing-3, 12px);
+  padding: var(--spacing-3, 12px);
+  border: 1px solid var(--color-border-subtle, #eee);
+  border-radius: var(--border-radius-medium, 6px);
+}
+
+.theme-customizer h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-2, 8px);
+}
+
+.theme-customizer input[type="color"] {
+  width: 100px;
+  height: 40px;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: var(--border-radius-small, 4px);
+  margin-right: var(--spacing-2, 8px);
+  vertical-align: middle;
+}
+
+/* High contrast mode adjustments */
+/* These are applied via JS by setting --background-color and --text-color */
+/* .ses-dashboard.high-contrast { ... } could also be a strategy */
+
+/* Zoomed state adjustments (if needed beyond data-text-zoom attributes) */
+.ses-dashboard.zoomed {
+  /* Example: increase base font size slightly if needed, though fluid typography should handle most */
+  /* font-size: calc(var(--text-body) * 1.1); */
+}
+
+/* Ensure AnimatePresence/motion divs don't add extra layout shifts if not styled */
+.ses-dashboard > div[style*="opacity: 0"] { /* Targeting motion.div during exit/enter */
+  /* Potentially add styling if needed, though AnimatePresence usually handles this well */
+}

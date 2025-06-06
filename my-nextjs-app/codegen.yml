@@ -1,0 +1,7 @@
+# codegen.yml
+schema: src/lib/api/agent.graphql
+generates:
+  src/types/agent.ts:
+    plugins:
+      - typescript
+      - typescript-operations

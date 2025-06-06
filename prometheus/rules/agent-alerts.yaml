@@ -1,0 +1,52 @@
+groups:
+- name: ses_agent_alerts
+  rules:
+  - alert: AgentLatencyAnomalyHigh
+    expr: ses:agent_execution_time_seconds:p95_5m > (predict_linear(ses:agent_execution_time_seconds:p95_5m[1h], 300) * 1.5)
+    for: 10m
+    labels:
+      severity: warning
+      type: anomaly
+    annotations:
+      summary: "Agent {{ $labels.agent_name }} latency is abnormally high"
+      description: "The P95 execution latency for agent {{ $labels.agent_name }} has increased by more than 50% compared to its predicted linear trend over the last hour."
+
+  - alert: TokenUsageAnomalyHigh
+    expr: ses:agent_token_usage:rate5m > (predict_linear(ses:agent_token_usage:rate5m[3h], 300) * 2.0)
+    for: 15m
+    labels:
+      severity: warning
+      type: anomaly
+    annotations:
+      summary: "Agent {{ $labels.agent_name }} token usage is abnormally high"
+      description: "The token usage rate for agent {{ $labels.agent_name }} has increased by more than 100% compared to its predicted linear trend over the last 3 hours."
+
+  - alert: AgentSuccessRateLow
+    expr: ses:agent_success_rate:ratio5m < 0.95
+    for: 5m
+    labels:
+      severity: critical
+      type: operational
+    annotations:
+      summary: "Agent {{ $labels.agent_name }} success rate is low"
+      description: "The success rate for agent {{ $labels.agent_name }} has dropped below 95% for 5 minutes."
+
+  - alert: VectorRecallLatencyHigh
+    expr: ses:vector_recall_latency_seconds:p95_5m > 0.5 # Example threshold: 500ms
+    for: 5m
+    labels:
+      severity: critical
+      type: operational
+    annotations:
+      summary: "Vector search latency is high for query type {{ $labels.query_type }}"
+      description: "The P95 vector search latency for query type {{ $labels.query_type }} has exceeded 500ms for 5 minutes."
+
+  - alert: LLMCostAnomalyHigh
+    expr: ses:llm_cost_usd:rate1h > 10 # Example threshold: $10/hour
+    for: 30m
+    labels:
+      severity: critical
+      type: cost
+    annotations:
+      summary: "LLM cost anomaly detected for agent {{ $labels.agent_name }}"
+      description: "The estimated LLM cost for agent {{ $labels.agent_name }} has exceeded $10/hour for 30 minutes, indicating a potential cost anomaly."

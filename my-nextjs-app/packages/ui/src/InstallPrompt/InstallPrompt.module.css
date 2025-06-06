@@ -1,0 +1,84 @@
+/* Styles for InstallPrompt.tsx */
+/* Using placeholder styles for the modal and buttons if they are not globally styled */
+
+.modal-placeholder {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure it's on top */
+}
+
+.modal-content-placeholder {
+  background-color: var(--color-background-primary, #fff);
+  padding: var(--spacing-5, 20px); /* Assuming spacing-5 is larger */
+  border-radius: var(--border-radius-large, 8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+}
+
+.modal-content-placeholder h2 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-3, 12px);
+  font-size: 1.25rem; /* Slightly larger title */
+  color: var(--color-text-primary, #333);
+}
+
+.modal-content-placeholder p {
+  margin-bottom: var(--spacing-4, 16px);
+  font-size: 1rem;
+  color: var(--color-text-secondary, #555);
+}
+
+.install-prompt-actions {
+  display: flex;
+  justify-content: center; /* Center buttons */
+  gap: var(--spacing-3, 12px); /* Space between buttons */
+  margin-top: var(--spacing-4, 16px);
+}
+
+/* Basic styling for placeholder buttons if not using a global .button class */
+.install-prompt-actions button,
+.modal-content-placeholder > button { /* Target the close button in placeholder modal */
+  padding: var(--spacing-2, 8px) var(--spacing-4, 16px);
+  border-radius: var(--border-radius-medium, 6px);
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.install-prompt-actions .button--primary {
+  background-color: var(--color-primary, #007bff);
+  color: var(--color-text-on-primary, #fff);
+}
+.install-prompt-actions .button--primary:hover {
+  background-color: var(--color-primary-hover, #0056b3); /* Assuming hover color */
+}
+
+.install-prompt-actions .button--secondary {
+  background-color: var(--color-secondary-button-background, #6c757d);
+  color: var(--color-text-on-secondary, #fff);
+  border: 1px solid var(--color-secondary-button-border, #6c757d);
+}
+.install-prompt-actions .button--secondary:hover {
+  background-color: var(--color-secondary-button-hover-background, #5a6268);
+}
+
+/* Style for the modal's own close button if it's separate */
+.modal-content-placeholder > button {
+    background-color: var(--color-background-muted, #f0f0f0);
+    color: var(--color-text-primary, #333);
+    border: 1px solid var(--color-border, #ccc);
+}
+.modal-content-placeholder > button:hover {
+    background-color: var(--color-background-muted-hover, #e0e0e0);
+}

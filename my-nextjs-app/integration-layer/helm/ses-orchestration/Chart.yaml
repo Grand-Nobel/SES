@@ -1,0 +1,17 @@
+# integration-layer/helm/ses-orchestration/Chart.yaml
+apiVersion: v2
+name: ses-orchestration
+description: A Helm chart for deploying SES orchestration components
+type: application # Or library, depending on how it's used
+version: 0.1.0
+appVersion: "1.0.0" # Optional: version of the application being deployed
+
+dependencies:
+  - name: kafka
+    version: "18.0.0" # Ensure this version is compatible and available
+    repository: "https://charts.bitnami.com/bitnami"
+    # condition: kafka.enabled # Optional: to make Kafka deployment conditional
+  - name: redis
+    version: "17.0.0" # Ensure this version is compatible and available
+    repository: "https://charts.bitnami.com/bitnami"
+    # condition: redis.enabled # Optional: to make Redis deployment conditional

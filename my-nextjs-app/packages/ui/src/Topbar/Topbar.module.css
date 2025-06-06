@@ -1,0 +1,8 @@
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2);
+  background: var(--color-background-primary);
+  border-bottom: 1px solid var(--color-blue-20);
+}

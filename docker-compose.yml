@@ -1,0 +1,90 @@
+services:
+  connector-service:
+    build:
+      context: ./my-nextjs-app
+      dockerfile: connector-service/Dockerfile
+    container_name: connector-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./my-nextjs-app/.env.local
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - VAULT_ADDR=${VAULT_ADDR:-http://vault:8200}
+      - VAULT_TOKEN=${VAULT_DEV_ROOT_TOKEN_ID}
+    depends_on:
+      - vault
+    networks:
+      - app-network
+
+  marketplace-service:
+    build:
+      context: ./my-nextjs-app
+      dockerfile: marketplace-service/Dockerfile
+    container_name: marketplace-service
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    env_file:
+      - ./my-nextjs-app/.env.local
+    environment:
+      - NODE_ENV=development
+      - PORT=3005
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+    depends_on: []
+    networks:
+      - app-network
+
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus:/etc/prometheus/
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.1.1
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - app-network
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+  vault:
+    image: hashicorp/vault:latest
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "myroottoken"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

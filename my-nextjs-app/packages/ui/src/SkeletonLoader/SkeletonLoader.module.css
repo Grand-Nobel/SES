@@ -1,0 +1,43 @@
+.skeletonLoader {
+  background-color: var(--color-surface); /* Or a slightly lighter/darker shade for contrast */
+  position: relative;
+  overflow: hidden;
+  opacity: 0.7; /* Slight transparency */
+}
+
+.skeletonLoader::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%; /* Start off-screen to the left */
+  height: 100%;
+  width: 150%; /* Wide enough to cover the element during animation */
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%, /* Shimmer color - adjust opacity as needed */
+    transparent 100%
+  );
+  animation: shimmer 1.5s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%); /* Move to the right end */
+  }
+}
+
+.visuallyHidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  white-space: nowrap; /* Prevent line breaks */
+}

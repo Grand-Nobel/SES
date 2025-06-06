@@ -1,0 +1,90 @@
+/* app/settings/themes/themes.module.css */
+.themes-page {
+  padding: var(--spacing-4, 16px);
+  font-family: var(--font-family-primary, sans-serif);
+}
+
+.themes-page h1 {
+  font-size: var(--text-h1, 2rem);
+  margin-bottom: var(--spacing-4, 16px);
+  color: var(--color-text-heading, inherit);
+}
+
+.theme-customizer {
+  margin: var(--spacing-4, 16px) 0;
+  padding: var(--spacing-4, 16px);
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: var(--border-radius-large, 8px);
+  background-color: var(--color-background-secondary, #f9f9f9);
+}
+
+.theme-customizer h2 {
+  font-size: var(--text-h2, 1.5rem);
+  margin-top: 0;
+  margin-bottom: var(--spacing-3, 12px);
+  color: var(--color-text-primary, #333);
+}
+
+.theme-customizer input[type="color"] {
+  width: 60px; /* Slightly larger for easier interaction */
+  height: 40px;
+  border: 1px solid var(--color-border-input, #ccc); /* Specific border for inputs */
+  border-radius: var(--border-radius-small, 4px);
+  padding: 0; /* Color inputs usually don't need padding */
+  cursor: pointer;
+  vertical-align: middle; /* Align with text input and preview */
+}
+
+.theme-customizer input[type="text"] {
+  padding: var(--spacing-2, 8px);
+  border: 1px solid var(--color-border-input, #ccc);
+  border-radius: var(--border-radius-small, 4px);
+  font-size: 1rem;
+  margin-left: var(--spacing-2, 8px); /* Space from color picker */
+  vertical-align: middle;
+  width: 120px; /* Fixed width for hex input */
+}
+
+.theme-customizer > div > div:first-of-type { /* Target the flex container for color inputs */
+  margin-bottom: var(--spacing-3, 12px);
+}
+
+.theme-customizer button {
+  /* Assuming global .button styles are available and Button component uses them */
+  /* Add specific margin if needed */
+  /* margin-top: var(--spacing-2, 8px); */
+}
+
+.error-message { /* For displaying errors within this page */
+  color: var(--color-error-text, red);
+  background-color: var(--color-error-background, #ffebee);
+  border: 1px solid var(--color-error-border, #ffcdd2);
+  padding: var(--spacing-2, 8px);
+  border-radius: var(--border-radius-medium, 6px);
+  margin-top: var(--spacing-3, 12px);
+}
+
+/* Styles for the consent modal elements if not handled by Modal component */
+/* These are examples if the Modal component is very generic */
+.themes-page .modal-placeholder p { /* Target p inside modal if needed */
+  margin-bottom: var(--spacing-3, 12px);
+}
+
+.themes-page .modal-placeholder label {
+  display: flex; /* Align checkbox and text */
+  align-items: center;
+  margin: var(--spacing-3, 12px) 0;
+  cursor: pointer;
+}
+
+.themes-page .modal-placeholder input[type="checkbox"] {
+  margin-right: var(--spacing-2, 8px);
+  width: 16px; /* Custom checkbox size */
+  height: 16px;
+}
+
+.themes-page .modal-placeholder div[style*="justify-content: flex-end"] button {
+  /* Targeting buttons in modal footer */
+  /* Example: Add some margin if Button component doesn't handle it in context */
+  /* margin-left: var(--spacing-2, 8px); */
+}

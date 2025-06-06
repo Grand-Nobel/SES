@@ -1,0 +1,188 @@
+.image-description-tool {
+  padding: var(--spacing-4, 16px);
+  background: var(--color-background-primary, #fff);
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: var(--border-radius-large, 8px);
+  font-family: sans-serif;
+}
+
+.image-description-tool__preview {
+  margin-bottom: var(--spacing-3, 12px);
+  min-height: 150px; /* Ensure preview area has some height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-background-secondary, #f9f9f9);
+  border-radius: var(--border-radius-medium, 6px);
+  overflow: hidden; /* Ensure image fits */
+}
+
+.image-description-tool__image {
+  max-width: 100%;
+  max-height: 300px; /* Limit preview image height */
+  display: block; /* Remove extra space below image */
+}
+
+.image-description-tool__placeholder {
+  width: 100%;
+  height: 150px; /* Consistent with min-height of preview */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-tertiary, #757575);
+  font-style: italic;
+}
+
+.image-description-tool__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3, 12px);
+}
+
+.image-description-tool__input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1, 4px);
+}
+
+.image-description-tool__input-group label {
+  font-weight: bold;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary, #555);
+}
+
+.image-description-tool__input-group .input,
+.image-description-tool__input-group .select,
+.image-description-tool__input-group .textarea {
+  padding: var(--spacing-2, 8px);
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: var(--border-radius-small, 4px);
+  font-size: 1rem;
+  width: 100%; /* Make form elements full width */
+  box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+.image-description-tool__input-group .textarea {
+  min-height: 60px; /* Minimum height for textarea */
+  resize: vertical; /* Allow vertical resizing */
+}
+
+.image-description-tool__input-group .input:disabled,
+.image-description-tool__input-group .select:disabled,
+.image-description-tool__input-group .textarea:disabled {
+  background-color: var(--color-background-disabled, #f0f0f0);
+  cursor: not-allowed;
+}
+
+
+.image-description-tool__guideline {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary, #757575);
+  margin-top: var(--spacing-0-5, 2px);
+}
+
+.image-description-tool__input-group small {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary, #757575);
+}
+
+.image-description-tool__actions {
+  display: flex;
+  gap: var(--spacing-2, 8px);
+  margin-top: var(--spacing-3, 12px);
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+.image-description-tool__actions .button { /* Assuming global .button styles exist */
+  padding: var(--spacing-2, 8px) var(--spacing-3, 12px);
+  border-radius: var(--border-radius-small, 4px);
+  cursor: pointer;
+  font-size: 0.875rem;
+  border: none;
+}
+
+.image-description-tool__actions .button--primary {
+  background-color: var(--color-primary, #007bff);
+  color: var(--color-text-on-primary, #fff);
+}
+.image-description-tool__actions .button--primary:disabled {
+  background-color: var(--color-primary-disabled, #a0cfff);
+  cursor: not-allowed;
+}
+
+
+.image-description-tool__actions .button--secondary {
+  background-color: var(--color-secondary, #6c757d);
+  color: var(--color-text-on-secondary, #fff);
+}
+.image-description-tool__actions .button--secondary:disabled {
+  background-color: var(--color-secondary-disabled, #c8cbce);
+  cursor: not-allowed;
+}
+
+
+.image-description-tool__validation {
+  margin-top: var(--spacing-3, 12px);
+  padding: var(--spacing-3, 12px);
+  border-radius: var(--border-radius-medium, 6px);
+}
+
+.image-description-tool__validation--valid {
+  background-color: var(--color-success-background, #e6ffed);
+  color: var(--color-success-text, #004d00);
+  border: 1px solid var(--color-success-border, #b3ffc6);
+}
+
+.image-description-tool__validation--invalid {
+  background-color: var(--color-error-background, #ffebee);
+  color: var(--color-error-text, #b71c1c);
+  border: 1px solid var(--color-error-border, #ffcdd2);
+}
+
+.image-description-tool__validation h4 {
+  margin-top: 0;
+  margin-bottom: var(--spacing-2, 8px);
+  font-size: 1rem;
+}
+.image-description-tool__validation p {
+    margin-bottom: var(--spacing-1, 4px);
+}
+
+.image-description-tool__issues h5,
+.image-description-tool__suggestions h5 {
+  margin-top: var(--spacing-2, 8px);
+  margin-bottom: var(--spacing-1, 4px);
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.image-description-tool__issues ul,
+.image-description-tool__suggestions ul {
+  list-style: disc;
+  margin-left: var(--spacing-3, 12px); /* Indent list */
+  padding-left: var(--spacing-2, 8px);
+  font-size: 0.875rem;
+}
+.image-description-tool__issues li,
+.image-description-tool__suggestions li {
+    margin-bottom: var(--spacing-0-5, 2px);
+}
+
+.image-description-tool__code-output {
+  margin-top: var(--spacing-4, 16px);
+}
+
+.image-description-tool__code-output h4 {
+  margin-bottom: var(--spacing-1, 4px);
+  font-size: 1rem;
+}
+
+.image-description-tool__code-output .code {
+  background-color: var(--color-code-background, #f0f0f0);
+  padding: var(--spacing-2, 8px);
+  border-radius: var(--border-radius-small, 4px);
+  overflow-x: auto; /* Allow horizontal scrolling for long code lines */
+  font-family: monospace;
+  font-size: 0.875rem;
+  white-space: pre-wrap; /* Wrap long lines but preserve whitespace */
+}

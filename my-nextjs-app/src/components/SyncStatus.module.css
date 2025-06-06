@@ -1,0 +1,70 @@
+/* my-nextjs-app/src/components/SyncStatus.module.css */
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1, 4px); /* Small gap between elements */
+  font-size: var(--text-caption, 0.75rem); /* Use caption size */
+  color: var(--color-text-secondary, #555);
+  padding: var(--spacing-1, 4px) var(--spacing-2, 8px);
+  border-radius: var(--border-radius-small, 4px);
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.sync-status--offline {
+  color: var(--color-warning-text, #b77a00); /* Warning color for offline */
+  background-color: var(--color-warning-background, #fff8e1);
+}
+
+.sync-status--syncing {
+  color: var(--color-info-text, #006064); /* Info color for syncing */
+  background-color: var(--color-info-background, #e0f7fa);
+}
+
+.sync-status--synced {
+  color: var(--color-success-text, #1b5e20); /* Success color for synced */
+  background-color: var(--color-success-background, #e8f5e9);
+}
+
+.sync-status__last-sync {
+  font-size: 0.9em; /* Slightly smaller for the "Last:" part */
+  opacity: 0.8;
+  margin-left: var(--spacing-1, 4px);
+}
+
+/* Optional: Add a small status indicator dot */
+.sync-status::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: var(--spacing-1, 4px);
+}
+
+.sync-status--offline::before {
+  background-color: var(--color-warning-accent, #ffc107);
+}
+
+.sync-status--syncing::before {
+  background-color: var(--color-info-accent, #00bcd4);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.sync-status--synced::before {
+  background-color: var(--color-success-accent, #4caf50);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.7;
+  }
+}

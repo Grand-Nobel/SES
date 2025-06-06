@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.json", // Inherit base settings
+  "compilerOptions": {
+    "outDir": "./dist", // Output directory for built files
+    "rootDir": "./src",   // Source directory
+    "declaration": true,  // Generate .d.ts files
+    "declarationMap": true, // Generate sourcemaps for .d.ts files
+    "sourceMap": true,      // Generate .js.map sourcemap files
+    "composite": false,      // Typically false for the final build config of a library
+    // Ensure module is appropriate for a library (e.g., CommonJS or ESModules)
+    // "module": "CommonJS", // Or "ESNext" if targeting ESM
+    // "moduleResolution": "node", // Or "bundler" for modern ESM
+    "noEmitOnError": true, // Do not emit outputs if any errors were reported
+    "skipLibCheck": true,  // Skip type checking of all declaration files (*.d.ts).
+    "stripInternal": true // Do not emit declarations for code that is annotated @internal
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "src/**/*.spec.ts"]
+}
